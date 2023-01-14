@@ -42,6 +42,8 @@ class NeuralNetwork():
         self.number_of_layers = number_of_layers
         self.number_of_neurons_per_layer = number_of_neurons_per_layer
         self.neural_net = []
+        self.time_alive = 0
+        self.number_of_feeding = 0
         for i in range(0, number_of_layers):
             layer = []
             for j in range(number_of_neurons_per_layer[i]):
@@ -90,17 +92,35 @@ class NeuralNetwork():
                 for idx, n in enumerate(self.neural_net[i+1]):
                     n.set_sum(sum_results[idx])
                     n.calculate_output()
+    
+    def get_output(self):
+        output = []
+        for n in self.neural_net[self.number_of_layers-1]:
+            output.append(n.output)
+        return output
+
+    def increment_number_of_feeding(self):
+        self.number_of_feeding+=1
+    
+    def reset_number_of_feeding(self):
+        self.number_of_feeding = 0
+    
+    def set_time_aliving(self, time):
+        self.time_alive = time
 
 
+#nn1 = NeuralNetwork(3, [2,3,2])
+#nn2 = NeuralNetwork(3, [2,3,2])
+#nn3 = NeuralNetwork(3, [2,3,2])
 
-nn = NeuralNetwork(5, [3,5,2,7,1])
-nn.input_data([0,3,2])
-nn.run_net()
-nn.print_neural_net()
+#nn1.input_data([0,3,2])
+#nn1.run_net()
+#print(nn1.get_output())
 
+#nn2.input_data([0,3,2])
+#nn2.run_net()
+#print(nn2.get_output())
 
-
-                    
-
-
-
+#nn3.input_data([0,3,2])
+#nn3.run_net()
+#print(nn3.get_output())
