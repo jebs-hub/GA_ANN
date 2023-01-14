@@ -8,15 +8,33 @@ class Neuron():
         self.output = None
         self.bias = bias
         self.weigths = weigths
+        self.sum = 0
+        self.weigths_times_output = []
     
     def set_output(self, output):
         self.output = output
+    
+    def calculate_output(self): #get sum, use bias and function
+        self.output = self.bias + self.sum
+        if(self.output < 0):
+            self.output = 0
     
     def set_bias(self, bias):
         self.bias = bias
     
     def set_weigths(self, weigths):
         self.wegths = weigths
+    
+    def increment_sum(self, sum):
+        self.sum += sum
+
+    def set_sum(self, sum):
+        self.sum = sum
+    
+    def calculate_weigths_times_output(self):
+        for w in self.weigths:
+            product = self.output*w
+            self.weigths_times_output.append(product)
 
 class NeuralNetwork():
 
@@ -40,17 +58,39 @@ class NeuralNetwork():
                 layer.append(neuron)
             self.neural_net.append(layer)
 
-    
+
     def print_neural_net(self):
         for i, layer in enumerate(self.neural_net):
             print("Layer {}".format(i))
             for j, neuron in enumerate(layer):
-                print("Neuron {}, bias: {}".format(j, neuron.bias))
+                print("\tNeuron {}, bias: {}".format(j, neuron.bias))
+                if(neuron.output != None):
+                    print("\t\toutput: {}".format(neuron.output))
                 for k, weigth in enumerate(neuron.weigths):
-                    print("weigth: {}".format(weigth))
+                    print("\t\t\tweigth: {}".format(weigth))
+    
+    def input_data(self, datas):
+        for i, neuron in enumerate(self.neural_net[0]):
+            neuron.set_output(datas[i])
+
+    
+    def run_net(self):
+        for i in range(self.number_of_layers): 
+            sum_results = [0*self.number_of_neurons_per_layer[i]]
+            for n in self.neural_net[i]: #para cada neuronio n da layer i atual
+                n.calculate_weigths_times_output()
+                result = n.weigths_times_output
+                sum_results+=result
+            if(i < self.number_of_layers-1):
+                for idx, n in enumerate(self.neural_net[i+1]):
+                    n.set_sum(sum_results[idx])
+                    n.calculate_output()
+
 
 
 nn = NeuralNetwork(3, [2,5,2])
+nn.input_data([0,3])
+nn.run_net()
 nn.print_neural_net()
 
 
