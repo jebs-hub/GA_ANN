@@ -72,15 +72,20 @@ class NeuralNetwork():
     def input_data(self, datas):
         for i, neuron in enumerate(self.neural_net[0]):
             neuron.set_output(datas[i])
-
+    
+    def sum_vectors(self,vector1, vector2):
+        vector3 = []
+        for i in range(len(vector1)):
+            vector3.append(vector1[i]+vector2[i])
+        return vector3
     
     def run_net(self):
-        for i in range(self.number_of_layers): 
-            sum_results = [0*self.number_of_neurons_per_layer[i]]
+        for i in range(self.number_of_layers-1): 
+            sum_results = [0]*self.number_of_neurons_per_layer[i+1]
             for n in self.neural_net[i]: #para cada neuronio n da layer i atual
                 n.calculate_weigths_times_output()
                 result = n.weigths_times_output
-                sum_results+=result
+                sum_results = self.sum_vectors(sum_results, result)
             if(i < self.number_of_layers-1):
                 for idx, n in enumerate(self.neural_net[i+1]):
                     n.set_sum(sum_results[idx])
@@ -88,8 +93,8 @@ class NeuralNetwork():
 
 
 
-nn = NeuralNetwork(3, [2,5,2])
-nn.input_data([0,3])
+nn = NeuralNetwork(5, [3,5,2,7,1])
+nn.input_data([0,3,2])
 nn.run_net()
 nn.print_neural_net()
 
