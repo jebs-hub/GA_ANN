@@ -46,6 +46,18 @@ class TestNeuron(unittest.TestCase):
         result = self.nn4.calculate_weights_times_output()
         self.assertEqual(result,[12,3,9,7.5])
 
+class TestNeuralNet(unittest.TestCase):
+    def __init__(self,*args, **kw):
+        super().__init__(*args, **kw)
+        self.nn = nn.NeuralNetwork(file="my_net.txt")
+    
+    def test_output(self):
+        input = [1,1]
+        self.nn.input_data(input)
+        self.nn.run_net()
+        output = self.nn.get_output()
+        self.assertEqual(output, [168,200])
+
 
 
 if __name__ == '__main__':
