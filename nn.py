@@ -20,7 +20,7 @@ class Neuron():
     def set_weights(self, weights: list[float]): #none a concern of neuron itself
         self.weights = weights                   #if length of weights changes
     
-    def set_weigth(self, i: int, new: float):
+    def set_weight(self, i: int, new: float):
         self.weights[i] = new
     
     def increment_sum(self, sum: float):
@@ -125,7 +125,7 @@ class NeuralNetwork():
                 if(neuron.output != None):
                     print("\t\toutput: {}".format(neuron.output))
                 for k, weight in enumerate(neuron.weights):
-                    print("\t\t\tweigth: {}".format(weight))
+                    print("\t\t\tweight: {}".format(weight))
     
 
     def input_data(self, datas):
@@ -193,24 +193,13 @@ class NeuralNetwork():
             else:
                 pass
         neural_net.append(layer)
+        f.close()
         return neural_net
 
 
 
 
-    #TODO the next methods should be in organism class 
-
-    def increment_number_of_feeding(self):
-        self.number_of_feeding+=1
-    
-
-    def reset_number_of_feeding(self):
-        self.number_of_feeding = 0
-    
-
-    def set_time_aliving(self, time): 
-        self.time_alive = time
-    
+    #TODO the next methods should be in organism class
 
     def copy(self):
         new_neural_net = []
@@ -220,36 +209,57 @@ class NeuralNetwork():
                 new_neuron = neuron.copy()
                 new_layer.append(new_neuron)
             new_neural_net.append(new_layer)
-        return NeuralNetwork(self.number_of_layers, self.number_of_neurons_per_layer,new_neural_net)
+        return NeuralNetwork(neural_net=new_neural_net)
 
 
-    def copy_with_mutation(self): #where to mutation things, maybe limit the number of mutation?
-        new_neural_net = []        #TODO mutation should be within organism class
-        for layer in self.neural_net[:-1]:  
+    def copy_with_mutation(self): #TODO where to mutation things, maybe limit the number of mutation?
+        new_neural_net = []         #TODO refactor. This function is awful
+        new_layer = [] 
+        for neuron in self.neural_net[0]:  
+            sort = random.randint(0,1) #zero or 1
+            new_neuron = neuron.copy() 
+            if(sort == 1 and len(new_neuron.weights)>0): #mutate
+                number_of_mutate_weights = random.randint(0, len(new_neuron.weights))
+                for i in range(number_of_mutate_weights):
+                    idx_mutate = random.randint(0,len(new_neuron.weights)-1)
+                    print(idx_mutate, len(new_neuron.weights))
+                    new_weight = random.uniform(-5,5)
+                    new_neuron.set_weight(idx_mutate,new_weight)
+            new_layer.append(new_neuron)
+        new_neural_net.append(new_layer)
+    
+        for layer in self.neural_net[1:-1]:  
             new_layer = []
             for neuron in layer:
-                sort = random.randint(0,2) #zero or 1
-                if(sort == 0):
-                    new_neuron = neuron.copy() #don't mutate
-                else:
-                    new_neuron = neuron.copy_with_mutation()
-                new_layer.append(new_neuron)
-            new_neural_net.append(new_layer)
-            new_layer = []
-            for neuron in self.neural_net[-1]:
-                sort = random.randint(0,2) #zero or 1
-                if(sort == 0):
-                    new_neuron = neuron.copy() #don't mutate
-                else:
-                    new_neuron = neuron.copy()
+                sort = random.randint(0,1) #zero or 1
+                new_neuron = neuron.copy() 
+                if(sort == 1): #mutate wegths
+                    number_of_mutate_weights = random.randint(0, len(new_neuron.weights)+1)
+                    for i in range(number_of_mutate_weights):
+                        idx_mutate = random.randint(0,len(new_neuron.weights)-1)
+                        new_weight = random.uniform(-5,5)
+                        new_neuron.set_weight(idx_mutate,new_weight)
+                sort = random.randint(0,1)
+                if(sort==1): #mutate bias
                     new_neuron.set_bias(random.uniform(-5,5))
                 new_layer.append(new_neuron)
-                new_neural_net.append(new_layer)
+            new_neural_net.append(new_layer)
+        new_layer = []
+        for neuron in self.neural_net[-1]:
+            sort = random.randint(0,1) #zero or 1
+            if(sort == 0):
+                new_neuron = neuron.copy() #don't mutate
+            else:
+                new_neuron = neuron.copy()
+                new_neuron.set_bias(random.uniform(-5,5))
+            new_layer.append(new_neuron)
+        new_neural_net.append(new_layer)
+        return NeuralNetwork(neural_net = new_neural_net)
 
-        return NeuralNetwork(self.number_of_layers, self.number_of_neurons_per_layer,new_neural_net)
-
-#n = NeuralNetwork(file="my_net.txt")
-#n.print()
+n = NeuralNetwork(file="my_net.txt")
+n.print()
+n2 = n.copy_with_mutation()
+n2.print()
 #n.input_data([1,1])
 #n.run_net()
 #print(n.get_output())
