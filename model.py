@@ -8,7 +8,7 @@ class OrganismBrain:
         self.idx = idx
         self.time_alive = 0
         if(neural_net == None):
-            self.nn = NeuralNetwork(number_of_neurons_per_layer=[3,4,5,4])
+            self.nn = NeuralNetwork(number_of_neurons_per_layer=[2,3,5,4])
         else: 
             self.nn = neural_net
 
@@ -25,7 +25,7 @@ class OrganismBrain:
 
     def copy_with_mutation(self):
         new_nn = self.nn.copy_with_mutation()
-        return Organisms(new_nn)
+        return OrganismBrain(new_nn)
     
     def isSelected(self):
         if(self.time_alive>=5 and self.number_of_feeding>=2):
@@ -33,15 +33,25 @@ class OrganismBrain:
         else:
             return False
     
+    def set_food_location(self, coords):
+        self.nn.input_data(coords)
+    
     def get_command(self):
+        self.nn.run_net()
         output = self.nn.get_output()
-        if(output[0]==1):
+        max = output[0]
+        idx = 0
+        for i in range(len(output)):
+            if(output[i]>max):
+                max == output[i]
+                idx = i
+        if(idx==0):
             return "up"
-        if(output[1]==1):
+        if(idx==1):
             return "down"
-        if(output[2]==1):
+        if(idx==2):
             return "right"
-        if(output[3]==1):
+        if(idx==3):
             return "left"
 
 

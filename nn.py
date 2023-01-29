@@ -1,15 +1,17 @@
 # Creation of neural network
 
 import random
+import math
 
 class Neuron():
 
-    def __init__(self, bias:float=None, weights:list[float]=[]): 
+    def __init__(self, bias:float=None, weights:list[float]=[], activate_function="reLU"):
         self.output = None
         self.bias = bias
         self.weights = weights
         self.sum = 0
         self.weights_times_output = []
+        self.activate_function = activate_function
     
     def set_output(self, output: float):
         self.output = output
@@ -34,8 +36,7 @@ class Neuron():
             self.output = self.bias + self.sum
         else:
             self.output = self.sum
-        if(self.output < 0):
-            self.output = 0
+        self.calc_activate_function()
         return self.output
     
     def calculate_weights_times_output(self):
@@ -46,8 +47,21 @@ class Neuron():
         return self.weights_times_output
     
     def copy(self):
-        copy = Neuron(self.bias, self.weights)
+        copy = Neuron(self.bias, self.weights, self.activate_function)
         return copy
+    
+    def set_activate_function(self, function):
+        self.activate_function = function
+    
+    def calc_activate_function(self):
+        if(self.activate_function=="reLU"):
+            if(self.output < 0):
+                self.output = 0
+            elif(self.output>30):
+                self.output = 30
+        else:
+            self.output = 1/(1 + math.exp(-self.output))
+        return self.output
 
 
 class NeuralNetwork():
@@ -112,7 +126,7 @@ class NeuralNetwork():
         layer = []
         for i in range(self.number_of_neurons_per_layer[-1]): #set last layer = output layer, no weghts
             bias = random.uniform(-5,5)
-            neuron = Neuron(bias=bias)
+            neuron = Neuron(bias=bias, activate_function="sigmoid")
             layer.append(neuron)
         self.neural_net.append(layer)
 
@@ -183,7 +197,10 @@ class NeuralNetwork():
                     bias = None
                 weights = values[1:]
                 weights = [int(w) for w in weights]
-                neuron = Neuron(bias, weights)
+                if(weights==[]):   
+                    neuron = Neuron(bias, weights)
+                else:
+                    neuron = Neuron(bias, weights, "sigmoid")
                 layer.append(neuron)
             elif(count_neurons == number_of_neurons):
                 neural_net.append(layer)
