@@ -68,7 +68,7 @@ class Organism():
         x_food = self.food.get_x()
         y_food = self.food.get_y()
         distance = math.sqrt(((x_food-self.x)**2+(y_food-self.y)**2))
-        if(distance<=5):
+        if(distance<=15):
             #collision
             self.feed()
     
