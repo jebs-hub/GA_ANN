@@ -239,7 +239,6 @@ class NeuralNetwork():
                 number_of_mutate_weights = random.randint(0, len(new_neuron.weights))
                 for i in range(number_of_mutate_weights):
                     idx_mutate = random.randint(0,len(new_neuron.weights)-1)
-                    print(idx_mutate, len(new_neuron.weights))
                     new_weight = random.uniform(-5,5)
                     new_neuron.set_weight(idx_mutate,new_weight)
             new_layer.append(new_neuron)
