@@ -1,7 +1,7 @@
 from nn import NeuralNetwork
 import random
 
-class Organisms:
+class OrganismBrain:
     
     def __init__(self, idx, neural_net=None):
         self.number_of_feeding = 0
