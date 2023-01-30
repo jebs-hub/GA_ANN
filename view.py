@@ -22,16 +22,16 @@ Green_color = "#7BC043"
 BLUE_COLOR_LIGHT = '#67B0CF'
 RED_COLOR_LIGHT = '#EE7E77'
 
-class Organism():
-
+class Organism(): #TODO need to change time alive considering the generations, change fitness score to considere survivor
+                                                       #score = (time alive) * (0.1+number of feeding)
     def __init__(self,canvas,idx,ancestral,nn=None):
-        self.x = random.randint(0,600)
-        self.y = random.randint(0,600)
         self.start_x = random.randint(0,600)
         self.start_y = random.randint(0,600)
+        self.x = self.start_x
+        self.y = self.start_x
         self.size = 5
         self.canvas = canvas
-        self.circle = self.canvas.create_oval(self.x, self.y, self.x+self.size, self.y+self.size, fill='#00f')
+        self.circle = self.canvas.create_oval(self.start_x, self.start_y, self.start_x+self.size, self.start_y+self.size, fill='#00f')
         if(nn==None):
             self.nn = OrganismBrain()
         else:
@@ -41,6 +41,9 @@ class Organism():
         self.start = time.time()
         self.idx = idx
         self.ancestral = ancestral
+        self.score = 0
+        self.start_xf = self.food.start_x
+        self.start_yf = self.food.start_y
     
     def input_information(self):
 
@@ -85,7 +88,7 @@ class Organism():
         x_food = self.food.get_x()
         y_food = self.food.get_y()
         distance = self.get_distance([x_food,y_food],[self.x, self.y])
-        if(distance<=15):
+        if(distance<=10):
             #collision
             self.feed()
     
@@ -93,13 +96,13 @@ class Organism():
         self.input_information()
         direction = self.reaction()
         if(direction=="up"):
-            self.y -= 2
+            self.y -= 10
         if(direction=="down"):
-            self.y += 2
+            self.y += 10
         if(direction=="right"):
-            self.x -= 2
+            self.x -= 10
         if(direction=="left"):
-            self.x += 2
+            self.x += 10
 
         self.canvas.move(self.circle, self.x, self.y)
 
@@ -133,6 +136,15 @@ class Organism():
         return Organism(self.canvas, idx,self.idx,nn=brain)
      
     def isSelected(self):
+        if(not self.dead):
+            self.nn.time_alive = 10
+        if(self.nn.number_of_feeding>=1):
+            initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
+            self.score = self.nn.time_alive + 10*self.nn.number_of_feeding + initial_distance//120
+        else:
+            initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
+            final_distance = self.get_distance([self.x,self.y],[self.start_xf,self.start_yf])
+            self.score = self.nn.time_alive + 10*(initial_distance-final_distance)//initial_distance
         if((not self.dead) and self.nn.number_of_feeding>=1):
             #print(not self.dead, self.nn.number_of_feeding)
             return True 
@@ -150,13 +162,13 @@ class Organism():
 class Food():
 
     def __init__(self, canvas):
-        self.x = random.randint(0,600)
-        self.y = random.randint(0,600)
         self.start_x = random.randint(0,600)
         self.start_y = random.randint(0,600)
+        self.x = self.start_x
+        self.y = self.start_y
         self.size = 7
         self.canvas = canvas
-        self.square = self.canvas.create_rectangle(self.x, self.y, self.x+self.size, self.y+self.size, fill='#7f3667')
+        self.square = self.canvas.create_rectangle(self.start_x, self.start_y, self.start_x+self.size, self.start_y+self.size, fill='#7f3667')
         self.gen = 1
 
     def set_x(self,x):
@@ -199,47 +211,59 @@ class environment:
             self.orgs.append(Organism(self.canvas,i,-1))
         self.start_time = time.time()
         self.gen = 0
+        self.moves = 0
 
     def move(self):
         for org in self.orgs:
             if(not org.isDead()):
                 org.move()
-        if(time.time()-self.start_time<=5):
+        if(time.time()-self.start_time<=120):
             self.window.after(500, self.move)
+        self.moves+=1
     
     def select(self):
         survivors = []
         #full = 0
         #success = 0
+        ok = 0
+        s = 0
         for o in self.orgs:
             if(o.isSelected()):
-                print("SUCCED",o.idx,o.ancestral)
-                survivors.append(o)
-            else: ##kill
-                o.remove()
-            self.orgs = []
-            if(len(survivors)>0):
-                number_of_decendents = 2000//len(survivors)
-                for o in survivors:
+                print("SUCCED",o.score, o.nn.number_of_feeding, o.nn.time_alive,o.start_x,o.start_y,o.start_xf,o.start_yf)
+                ok+=1
+            #else:
+                #if(o.score>0):
+                    #print("FAILED",o.score,o.nn.number_of_feeding, o.nn.time_alive)
+            #if(o.nn.time_alive==10):
+                #s+=1
+        print("survivors: {}, alives: {}".format(ok,s))
+             #   survivors.append(o)
+            #else: ##kill
+             #   o.remove()
+            #self.orgs = []
+            #if(len(survivors)>0):
+                #number_of_decendents = 2000//len(survivors)
+                #for o in survivors:
                     #self.organisms.append(o)
-                    for i in range(0,number_of_decendents):
-                        new = o.reproduce(i)
-                        self.orgs.append(new)
-                self.gen+=1
-                print("gen {}".format(self.gen))
-                self.start()
+                 #   for i in range(0,number_of_decendents):
+                  #      new = o.reproduce(i)
+                   #     self.orgs.append(new)
+                #self.gen+=1
+                #print("gen {}".format(self.gen))
+                #self.start()
             #if(not o.isDead()):
              #   survivors+=1
             #if(o.nn.number_of_feeding>0):
                 #full+=1
         #print(survivors, full)
+        print(self.moves, time.time(), self.start_time, time.time()-self.start_time)
 
     def start(self):
         self.move()
+        self.start_time = time.time()
         #self.window.update()
-        while (time.time()-self.start_time<=3):
-            #self.window.update()
-            pass
+        while (time.time()-self.start_time<=120):
+            self.window.update()
         self.select()
 
 game_instance = environment()

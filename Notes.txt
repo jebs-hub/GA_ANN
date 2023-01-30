@@ -1,0 +1,15 @@
+TODOS
+-> refactor code 
+-> function to write reports with valid informations about the survivors 
+   (distance from the food and others)
+-> Function to write data to be read after and continue the selection through days (save state)
+-> write doc 
+
+-> write problems faced and changes of plans
+-> Fixed fitness score to correct ones who passes for many generations
+
+
+PROBLEMS
+    The population is not growing, always one survive
+    Dificulty to choose the initial range for weights and biases (|10| -> |1|)
+    Dificulty to choose which inputs and outputs are better for the net 
