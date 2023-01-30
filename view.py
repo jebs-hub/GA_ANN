@@ -24,7 +24,7 @@ RED_COLOR_LIGHT = '#EE7E77'
 
 class Organism():
 
-    def __init__(self,canvas,idx,nn=None):
+    def __init__(self,canvas,idx,ancestral,nn=None):
         self.x = random.randint(0,600)
         self.y = random.randint(0,600)
         self.start_x = random.randint(0,600)
@@ -33,12 +33,14 @@ class Organism():
         self.canvas = canvas
         self.circle = self.canvas.create_oval(self.x, self.y, self.x+self.size, self.y+self.size, fill='#00f')
         if(nn==None):
-            self.nn = OrganismBrain(idx)
+            self.nn = OrganismBrain()
         else:
             self.nn = nn
         self.dead = False
         self.food = Food(self.canvas)
         self.start = time.time()
+        self.idx = idx
+        self.ancestral = ancestral
     
     def input_information(self):
 
@@ -121,13 +123,14 @@ class Organism():
     def die(self, time):
         self.nn.set_time_alive(time)
         self.dead = True
+        self.remove()
     
     def isDead(self):
         return self.dead
 
-    def reproduce(self):
+    def reproduce(self, idx):
         brain = self.nn.copy_with_mutation()
-        return Organism(self.canvas, 0,nn=brain)
+        return Organism(self.canvas, idx,self.idx,nn=brain)
      
     def isSelected(self):
         if((not self.dead) and self.nn.number_of_feeding>=1):
@@ -137,8 +140,9 @@ class Organism():
             return False
     
     def remove(self):
-        self.canvas.delete(self.circle)
-        self.food.eat()
+        if(not self.isDead()):
+            self.canvas.delete(self.circle)
+            self.food.eat()
 
     #TODO how to deal with collision? Here or in the other class
     
@@ -191,8 +195,8 @@ class environment:
         self.canvas.pack()
         self.should_stop = False
         self.orgs = []
-        for i in range(2000):
-            self.orgs.append(Organism(self.canvas,i))
+        for i in range(1,2001):
+            self.orgs.append(Organism(self.canvas,i,-1))
         self.start_time = time.time()
         self.gen = 0
 
@@ -209,18 +213,18 @@ class environment:
         #success = 0
         for o in self.orgs:
             if(o.isSelected()):
-                print("SUCCED")
+                print("SUCCED",o.idx,o.ancestral)
                 survivors.append(o)
             else: ##kill
                 o.remove()
-            self.organisms = []
+            self.orgs = []
             if(len(survivors)>0):
                 number_of_decendents = 2000//len(survivors)
                 for o in survivors:
-                    self.organisms.append(o)
+                    #self.organisms.append(o)
                     for i in range(0,number_of_decendents):
-                        new = o.reproduce()
-                        self.organisms.append(new)
+                        new = o.reproduce(i)
+                        self.orgs.append(new)
                 self.gen+=1
                 print("gen {}".format(self.gen))
                 self.start()
@@ -232,8 +236,10 @@ class environment:
 
     def start(self):
         self.move()
+        #self.window.update()
         while (time.time()-self.start_time<=3):
-            self.window.update()
+            #self.window.update()
+            pass
         self.select()
 
 game_instance = environment()

@@ -3,9 +3,8 @@ import random
 
 class OrganismBrain:
     
-    def __init__(self, idx, neural_net=None):
+    def __init__(self,neural_net=None):
         self.number_of_feeding = 0
-        self.idx = idx
         self.time_alive = 0
         if(neural_net == None):
             self.nn = NeuralNetwork(number_of_neurons_per_layer=[8,6,4])
@@ -25,7 +24,7 @@ class OrganismBrain:
 
     def copy_with_mutation(self):
         new_nn = self.nn.copy_with_mutation()
-        return OrganismBrain(new_nn)
+        return OrganismBrain(neural_net=new_nn)
     
     def isSelected(self):
         if(self.time_alive>=5 and self.number_of_feeding>=2):
