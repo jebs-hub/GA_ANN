@@ -41,7 +41,16 @@ class Organism():
         self.start = time.time()
     
     def input_information(self):
-        self.nn.set_food_location([self.food.get_x(), self.food.get_y()])
+
+        d_wall_up = self.y
+        d_wall_down = 600-self.y
+        d_wall_right = 600-self.x
+        d_wall_left = self.x
+
+        d_food_up = self.y-self.food.get_y()
+        d_food_right = self.food.get_x()-self.x
+
+        self.nn.sense_environment([d_wall_up,d_wall_down,d_wall_right,d_wall_left,d_food_up,-d_food_up,d_food_right,-d_food_right])
     
     def reaction(self):
         return self.nn.get_command()
@@ -67,42 +76,37 @@ class Organism():
     def set_canvas(self, canvas):
         self.canvas = canvas
     
+    def get_distance(self,point1, point2):
+        return math.sqrt(((point1[0]-point2[0])**2+(point1[1]-point2[1])**2))
+    
     def treat_collision(self):
         x_food = self.food.get_x()
         y_food = self.food.get_y()
-        distance = math.sqrt(((x_food-self.x)**2+(y_food-self.y)**2))
+        distance = self.get_distance([x_food,y_food],[self.x, self.y])
         if(distance<=15):
             #collision
             self.feed()
     
     def move(self):
         self.input_information()
-        new_x = self.x 
-        new_y = self.y
         direction = self.reaction()
         if(direction=="up"):
-            new_y = 1
+            self.y -= 2
         if(direction=="down"):
-            new_y = -1
+            self.y += 2
         if(direction=="right"):
-            new_x = 1
+            self.x -= 2
         if(direction=="left"):
-            new_x = -1
+            self.x += 2
 
-        self.canvas.move(self.circle, new_x, new_y)
-        coordinates = self.canvas.coords(self.circle)
-        try:
-            self.x = coordinates[0]
-        except:
-            print(coordinates, new_x, new_y)
-            raise Exception("error")
+        self.canvas.move(self.circle, self.x, self.y)
 
         # if outside screen move to start position
         if(self.y < 10 or self.y>590):
             self.die(time.time()-self.start)
         if (self.x < 10 or self.x>590):
             self.die(time.time()-self.start)
-        self.canvas.coords(self.circle, self.x, self.y, self.x + self.size, self.y + self.size)
+        #self.canvas.coords(self.circle, self.x, self.y, self.x + self.size, self.y + self.size)
 
         if(not self.dead): #detect collision
             self.treat_collision()
@@ -201,8 +205,8 @@ class environment:
     
     def select(self):
         survivors = []
-        full = 0
-        success = 0
+        #full = 0
+        #success = 0
         for o in self.orgs:
             if(o.isSelected()):
                 print("SUCCED")
@@ -213,7 +217,7 @@ class environment:
             if(len(survivors)>0):
                 number_of_decendents = 2000//len(survivors)
                 for o in survivors:
-                    self.organisms.append(0)
+                    self.organisms.append(o)
                     for i in range(0,number_of_decendents):
                         new = o.reproduce()
                         self.organisms.append(new)

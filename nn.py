@@ -105,7 +105,7 @@ class NeuralNetwork():
         for i in range(self.number_of_neurons_per_layer[0]): #set first layer = input layer, no bias
             weights = []
             for k in range(self.number_of_neurons_per_layer[1]): 
-                weight = random.uniform(-5,5)
+                weight = random.uniform(-1,1)
                 weights.append(weight)
             neuron = Neuron(None, weights)
             layer.append(neuron) 
@@ -115,9 +115,9 @@ class NeuralNetwork():
             layer = []
             for j in range(self.number_of_neurons_per_layer[i]):
                 weights = []
-                bias = random.uniform(-5,5)
+                bias = random.uniform(-1,1)
                 for k in range(self.number_of_neurons_per_layer[i+1]): 
-                    weight = random.uniform(-5,5)
+                    weight = random.uniform(-1,1)
                     weights.append(weight)
                 neuron = Neuron(bias, weights)
                 layer.append(neuron) 
@@ -125,7 +125,7 @@ class NeuralNetwork():
         
         layer = []
         for i in range(self.number_of_neurons_per_layer[-1]): #set last layer = output layer, no weghts
-            bias = random.uniform(-5,5)
+            bias = random.uniform(-1,1)
             neuron = Neuron(bias=bias, activate_function="sigmoid")
             layer.append(neuron)
         self.neural_net.append(layer)
@@ -239,7 +239,7 @@ class NeuralNetwork():
                 number_of_mutate_weights = random.randint(0, len(new_neuron.weights))
                 for i in range(number_of_mutate_weights):
                     idx_mutate = random.randint(0,len(new_neuron.weights)-1)
-                    new_weight = random.uniform(-5,5)
+                    new_weight = random.uniform(-1,1)
                     new_neuron.set_weight(idx_mutate,new_weight)
             new_layer.append(new_neuron)
         new_neural_net.append(new_layer)
@@ -253,11 +253,11 @@ class NeuralNetwork():
                     number_of_mutate_weights = random.randint(0, len(new_neuron.weights)+1)
                     for i in range(number_of_mutate_weights):
                         idx_mutate = random.randint(0,len(new_neuron.weights)-1)
-                        new_weight = random.uniform(-5,5)
+                        new_weight = random.uniform(-1,1)
                         new_neuron.set_weight(idx_mutate,new_weight)
                 sort = random.randint(0,1)
                 if(sort==1): #mutate bias
-                    new_neuron.set_bias(random.uniform(-5,5))
+                    new_neuron.set_bias(random.uniform(-1,1))
                 new_layer.append(new_neuron)
             new_neural_net.append(new_layer)
         new_layer = []
@@ -267,7 +267,7 @@ class NeuralNetwork():
                 new_neuron = neuron.copy() #don't mutate
             else:
                 new_neuron = neuron.copy()
-                new_neuron.set_bias(random.uniform(-5,5))
+                new_neuron.set_bias(random.uniform(-1,1))
             new_layer.append(new_neuron)
         new_neural_net.append(new_layer)
         return NeuralNetwork(neural_net = new_neural_net)

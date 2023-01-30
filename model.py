@@ -8,7 +8,7 @@ class OrganismBrain:
         self.idx = idx
         self.time_alive = 0
         if(neural_net == None):
-            self.nn = NeuralNetwork(number_of_neurons_per_layer=[2,3,5,4])
+            self.nn = NeuralNetwork(number_of_neurons_per_layer=[8,6,4])
         else: 
             self.nn = neural_net
 
@@ -33,7 +33,7 @@ class OrganismBrain:
         else:
             return False
     
-    def set_food_location(self, coords):
+    def sense_environment(self, coords):
         self.nn.input_data(coords)
     
     def get_command(self):
