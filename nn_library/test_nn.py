@@ -1,7 +1,7 @@
 import unittest
 import sys
 sys.path.append('.')
-import nn_library.nn as nn
+import nn as nn
 
 
 class TestNeuron(unittest.TestCase):

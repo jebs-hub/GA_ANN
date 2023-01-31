@@ -263,6 +263,11 @@ class NeuralNetwork():
         for n in self.neural_net[self.number_of_layers-1]:
             output.append(n.output)
         return output
+    
+    
+    def input_data(self, data):
+        for i in range(len(data)):
+            self.neural_net[0][i].set_output(data[i])
 
 
     def run_net(self):
@@ -322,8 +327,8 @@ class NeuralNetwork():
 
     # ------------------------------------------------------------------------------------------------------------------- #
 
-n = NeuralNetwork(file="my_net.txt")
-n.write_nn("out.txt")
+#n = NeuralNetwork(file="my_net.txt")
+#n.write_nn("out.txt")
 #n.print()
 #n2 = n.copy_with_mutation()
 #n2.print()

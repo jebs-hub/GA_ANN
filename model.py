@@ -1,6 +1,5 @@
 from nn_library.nn import NeuralNetwork
 
-#Parameters
 nn_eskeleton = [8,6,4] #default neural net for our model
 
 class OrganismBrain:
@@ -20,7 +19,7 @@ class OrganismBrain:
     
 
     def get_number_of_feeding(self):
-        return self.number_of_feedings
+        return self.number_of_feeding
 
 
     def reset_number_of_feeding(self):
@@ -38,7 +37,7 @@ class OrganismBrain:
     def copy_with_mutation(self):
         new_nn = self.nn.copy_with_mutation()
         return OrganismBrain(neural_net=new_nn)
-
+        
 
     def get_environment_info(self, coords):
         self.nn.input_data(coords)

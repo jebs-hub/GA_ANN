@@ -10,7 +10,7 @@ import math
 #Parameters
 size_of_board = 600
 collision_radius = 6.5
-organism_size = 5
+organism_size = 15
 food_size = 7
 
 class Food():
@@ -182,8 +182,8 @@ class OrganismView():
 
 
     def die(self):
-        time = time.time() - self.start
-        self.brain.set_time_alive(time)
+        time_alive = time.time() - self.start
+        self.brain.set_time_alive(time_alive)
         self.dead = True
         self.remove()
     
@@ -232,7 +232,7 @@ class environment:
         self.start_time = time.time()
         self.gen = 0
         self.moves = 0
-        self.ret = self.canvas.create_rectangle(0, 0, 10, size_of_board, fill='green')
+        #self.ret = self.canvas.create_rectangle(0, 0, 10, size_of_board, fill='green')
     
 
     def move(self):
@@ -247,7 +247,7 @@ class environment:
         ok = 0
         for o in self.orgs:
             if(o.isSelected()):
-                print("SUCCED",o.score, o.nn.number_of_feeding, o.nn.time_alive,o.start_x,o.start_y,o.start_xf,o.start_yf)
+                print("SUCCED",o.score, o.brain.number_of_feeding, o.brain.time_alive,o.start_x,o.start_y,o.start_xf,o.start_yf)
                 ok+=1
         print("survivors: {}, moves: {}".format(ok,self.moves))
 
