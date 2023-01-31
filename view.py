@@ -18,6 +18,8 @@ class Food():
     def __init__(self,canvas,color):
         self.start_x = random.randint(0,size_of_board)
         self.start_y = random.randint(0,size_of_board)
+        #self.start_x = 20
+        #self.start_y = 20
         self.x = self.start_x
         self.y = self.start_y
         self.size = food_size
@@ -59,8 +61,10 @@ class OrganismView():
         
         #canvas set up
 
-        self.start_x = random.randint(0,size_of_board)
-        self.start_y = random.randint(0,600)
+        self.start_x = random.randint(20,size_of_board-20)
+        self.start_y = random.randint(20,size_of_board-20)
+        #self.start_x = 30
+        #self.start_y = 30
         self.x = self.start_x
         self.y = self.start_x
         self.size = organism_size
@@ -154,14 +158,20 @@ class OrganismView():
     def move(self):
         self.input_information()
         direction = self.reaction()
+        steps_x = 0
+        steps_y = 0
         if(direction=="up"):
             self.y -= 10
+            steps_y = -10
         elif(direction=="down"):
             self.y += 10
+            steps_y = 10
         elif(direction=="right"):
-            self.x -= 10
-        elif(direction=="left"):
             self.x += 10
+            steps_x = 10
+        elif(direction=="left"):
+            self.x -= 10
+            steps_x = -10
         else:
             print("no COMMAND")
 
@@ -169,8 +179,8 @@ class OrganismView():
         if(self.isOutOfBounds()):
             self.die()
         else:
-            self.canvas.move(self.circle, self.x, self.y)
-            if(self.isFoodReached):
+            self.canvas.move(self.circle, steps_x, steps_y)
+            if(self.isFoodReached()):
                 self.feed()
 
     
@@ -252,7 +262,7 @@ class environment:
         print("survivors: {}, moves: {}".format(ok,self.moves))
 
     def start(self):
-        self.move()
+        self.window.after(500, self.move)
         self.start_time = time.time()
         while (time.time()-self.start_time<=120):
             self.window.update()
