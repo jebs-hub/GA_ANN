@@ -31,13 +31,15 @@ class Organism(): #TODO need to change time alive considering the generations, c
         self.y = self.start_x
         self.size = 5
         self.canvas = canvas
-        self.circle = self.canvas.create_oval(self.start_x, self.start_y, self.start_x+self.size, self.start_y+self.size, fill='#00f')
+        r = lambda: random.randint(0,255)
+        self.color = '#%02X%02X%02X' % (r(),r(),r())
+        self.circle = self.canvas.create_oval(self.start_x, self.start_y, self.start_x+self.size, self.start_y+self.size, fill=self.color)
         if(nn==None):
             self.nn = OrganismBrain()
         else:
             self.nn = nn
         self.dead = False
-        self.food = Food(self.canvas)
+        self.food = Food(self.canvas,self.color)
         self.start = time.time()
         self.idx = idx
         self.ancestral = ancestral
@@ -88,7 +90,7 @@ class Organism(): #TODO need to change time alive considering the generations, c
         x_food = self.food.get_x()
         y_food = self.food.get_y()
         distance = self.get_distance([x_food,y_food],[self.x, self.y])
-        if(distance<=10):
+        if(distance<=6.5):
             #collision
             self.feed()
     
@@ -97,12 +99,14 @@ class Organism(): #TODO need to change time alive considering the generations, c
         direction = self.reaction()
         if(direction=="up"):
             self.y -= 10
-        if(direction=="down"):
+        elif(direction=="down"):
             self.y += 10
-        if(direction=="right"):
+        elif(direction=="right"):
             self.x -= 10
-        if(direction=="left"):
+        elif(direction=="left"):
             self.x += 10
+        else:
+            print("no COMMAND")
 
         self.canvas.move(self.circle, self.x, self.y)
 
@@ -120,7 +124,7 @@ class Organism(): #TODO need to change time alive considering the generations, c
     def feed(self):
         self.nn.increment_number_of_feeding()
         old = self.food 
-        self.food = Food(self.canvas)
+        self.food = Food(self.canvas, self.color)
         old.eat()
 
     def die(self, time):
@@ -155,20 +159,18 @@ class Organism(): #TODO need to change time alive considering the generations, c
         if(not self.isDead()):
             self.canvas.delete(self.circle)
             self.food.eat()
-
-    #TODO how to deal with collision? Here or in the other class
     
 
 class Food():
 
-    def __init__(self, canvas):
+    def __init__(self, canvas,color):
         self.start_x = random.randint(0,600)
         self.start_y = random.randint(0,600)
         self.x = self.start_x
         self.y = self.start_y
         self.size = 7
         self.canvas = canvas
-        self.square = self.canvas.create_rectangle(self.start_x, self.start_y, self.start_x+self.size, self.start_y+self.size, fill='#7f3667')
+        self.square = self.canvas.create_rectangle(self.start_x, self.start_y, self.start_x+self.size, self.start_y+self.size, fill=color)
         self.gen = 1
 
     def set_x(self,x):
@@ -212,6 +214,8 @@ class environment:
         self.start_time = time.time()
         self.gen = 0
         self.moves = 0
+        self.ret = self.canvas.create_rectangle(0, 0, 10, 600, fill='green')
+    
 
     def move(self):
         for org in self.orgs:

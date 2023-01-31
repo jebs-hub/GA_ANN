@@ -1,12 +1,17 @@
 TODOS
 -> refactor code 
+-> write doc
 -> function to write reports with valid informations about the survivors 
    (distance from the food and others)
--> Function to write data to be read after and continue the selection through days (save state)
--> write doc 
+-> Function to write data to be read after and continue the selection through days (save state) 
 
 -> write problems faced and changes of plans
--> Fixed fitness score to correct ones who passes for many generations
+-> Create fitness score to select more people
+-> change the way distance is calculated 
+-> explore the magnitude of sizes that I'm using
+-> prevent organisms to begin in the wall
+-> why are there still organisms?
+-> better way to get the output: I am just getting the bigger one
 
 
 PROBLEMS
