@@ -1,7 +1,7 @@
 import unittest
 import sys
 sys.path.append('.')
-import nn
+import nn_library.nn as nn
 
 
 class TestNeuron(unittest.TestCase):
@@ -57,7 +57,6 @@ class TestNeuralNet(unittest.TestCase):
         self.nn.run_net()
         output = self.nn.get_output()
         self.assertEqual(output, [168,200])
-
 
 
 if __name__ == '__main__':

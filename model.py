@@ -1,4 +1,4 @@
-from nn import NeuralNetwork
+from nn_library.nn import NeuralNetwork
 import random
 
 class OrganismBrain:

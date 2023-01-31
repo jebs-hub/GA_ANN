@@ -16,8 +16,14 @@ class Neuron():
     def set_output(self, output: float):
         self.output = output
     
+    def get_outpu(self):
+        return self.output
+    
     def set_bias(self, bias: float):
         self.bias = bias
+    
+    def get_bias(self):
+        return self.bias
     
     def set_weights(self, weights: list[float]): #none a concern of neuron itself
         self.weights = weights                   #if length of weights changes
@@ -25,11 +31,20 @@ class Neuron():
     def set_weight(self, i: int, new: float):
         self.weights[i] = new
     
+    def get_weights(self):
+        return self.weights
+    
+    def get_weight(self, i):
+        return self.weights[i]
+    
     def increment_sum(self, sum: float):
         self.sum += sum
 
     def set_sum(self, sum:float):
         self.sum = sum
+    
+    def get_sum(self):
+        return self.sum
     
     def calculate_output(self): #get sum, use bias and function
         if(self.bias!=None):
@@ -39,8 +54,8 @@ class Neuron():
         self.calc_activate_function()
         return self.output
     
-    def calculate_weights_times_output(self):
-        self.weights_times_output = []
+    def calculate_weights_times_output(self): #It's a list of the inputs that will be used in the some 
+        self.weights_times_output = []        #of neuron of next layer
         for w in self.weights:
             product = self.output*w
             self.weights_times_output.append(product)
@@ -52,6 +67,9 @@ class Neuron():
     
     def set_activate_function(self, function):
         self.activate_function = function
+    
+    def activate_function(self):
+        return self.activate_function
     
     def calc_activate_function(self):
         if(self.activate_function=="reLU"):
@@ -67,30 +85,49 @@ class Neuron():
 class NeuralNetwork():
 
 
-    def __init__(self, number_of_neurons_per_layer:list[int]=None,neural_net:list[list[Neuron]]=[], file=None):
+    def __init__(self, number_of_neurons_per_layer:list[int]=None,neural_net:list[list[Neuron]]=None, file=None):
         
-        if(file!=None):
+        ##We suppose the file or the given neural net are valid
+        #We aren't validating entry
+
+        #Once the network is set, It can't be changed
+
+        choosen = self.select_arguments(number_of_neurons_per_layer, neural_net, file) 
+                                                                                
+        if choosen==1 :    
             self.neural_net = self.read_nn(file)
             self.number_of_layers = len(self.neural_net)
             self.number_of_neurons_per_layer = self.count_neurons_per_layer()
-        elif(number_of_neurons_per_layer==None and neural_net==[]): 
-            raise Exception("It is not possible create a empty Neural Network. Input a model or number of neurons per layer")
-        elif(number_of_neurons_per_layer!=None and neural_net!=[]):
-            raise Exception("You cannot set two parameters at same time. Choose between number_of_neurons_per_layer/neural_net")
-        elif neural_net == [] and self.isValid():
+        elif choosen==2 :
             self.number_of_layers = len(number_of_neurons_per_layer)
             self.number_of_neurons_per_layer = number_of_neurons_per_layer
             self.neural_net = []
             self.create_random_neural_net()
-        elif neural_net != [] and self.isValid():
+        elif choosen==3 :
             self.neural_net = neural_net
             self.number_of_layers = len(neural_net)
             self.number_of_neurons_per_layer = self.count_neurons_per_layer()
-        else:
-            raise Exception("Check your arguments, they are not valid")
+
+
+    # ----------------------------------------- Constructor auxiliary functions -------------------------------------------- #
     
-    def isValid(self): #TODO isValid function and test constructor
-        return True
+    def select_arguments(self,number_of_neurons_per_layer, neural_net,file):
+        nones = 0
+        choosen = 0
+        if(file==None):
+            nones+=1
+            choosen = 1
+        if(number_of_neurons_per_layer==None):
+            nones+=1
+            choosen = 2
+        if(neural_net==None):
+            Nones+=1
+            choosen = 3
+        if(nones!=2):
+            self.Error("You must choose only one way to create the neural net: from a file, randonly or a given neural neral")
+        else:
+            return choosen
+    
 
     def count_neurons_per_layer(self):
         number_of_neurons_per_layer = []
@@ -105,7 +142,7 @@ class NeuralNetwork():
         for i in range(self.number_of_neurons_per_layer[0]): #set first layer = input layer, no bias
             weights = []
             for k in range(self.number_of_neurons_per_layer[1]): 
-                weight = random.uniform(-1,1)
+                weight = self.get_random_value()
                 weights.append(weight)
             neuron = Neuron(None, weights)
             layer.append(neuron) 
@@ -115,9 +152,9 @@ class NeuralNetwork():
             layer = []
             for j in range(self.number_of_neurons_per_layer[i]):
                 weights = []
-                bias = random.uniform(-1,1)
+                bias = self.get_random_value()
                 for k in range(self.number_of_neurons_per_layer[i+1]): 
-                    weight = random.uniform(-1,1)
+                    weight = self.get_random_value()
                     weights.append(weight)
                 neuron = Neuron(bias, weights)
                 layer.append(neuron) 
@@ -125,54 +162,12 @@ class NeuralNetwork():
         
         layer = []
         for i in range(self.number_of_neurons_per_layer[-1]): #set last layer = output layer, no weghts
-            bias = random.uniform(-1,1)
+            bias = self.get_random_value()
             neuron = Neuron(bias=bias, activate_function="sigmoid")
             layer.append(neuron)
         self.neural_net.append(layer)
 
 
-    def print(self):
-        for i, layer in enumerate(self.neural_net):
-            print("Layer {}".format(i))
-            for j, neuron in enumerate(layer):
-                print("\tNeuron {}, bias: {}".format(j, neuron.bias))
-                if(neuron.output != None):
-                    print("\t\toutput: {}".format(neuron.output))
-                for k, weight in enumerate(neuron.weights):
-                    print("\t\t\tweight: {}".format(weight))
-    
-
-    def input_data(self, datas):
-        for i, neuron in enumerate(self.neural_net[0]):
-            neuron.set_output(datas[i])
-    
-
-    def sum_vectors(self,vector1, vector2):
-        vector3 = []
-        for i in range(len(vector1)):
-            vector3.append(vector1[i]+vector2[i])
-        return vector3
-    
-
-    def run_net(self):
-        for i in range(self.number_of_layers-1): 
-            sum_results = [0]*self.number_of_neurons_per_layer[i+1]
-            for n in self.neural_net[i]: #para cada neuronio n da layer i atual
-                n.calculate_weights_times_output()
-                result = n.weights_times_output
-                sum_results = self.sum_vectors(sum_results, result)
-            if(i < self.number_of_layers-1):
-                for idx, n in enumerate(self.neural_net[i+1]):
-                    n.set_sum(sum_results[idx])
-                    n.calculate_output()
-    
-
-    def get_output(self):
-        output = []
-        for n in self.neural_net[self.number_of_layers-1]:
-            output.append(n.output)
-        return output
-    
     def read_nn(self, file):
         #one with number of neurons
         #next n lines, one for one neuron. The first number are bias
@@ -213,10 +208,56 @@ class NeuralNetwork():
         f.close()
         return neural_net
 
+    
+    # --------------------------------------- Functions for general proposes ------------------------------------------ # 
+    
+    def Error(self, message):
+        raise Exception(message)
+    
+
+    def get_random_value(self):
+        return random.uniform(-1,1)
 
 
+    def print(self):
+        for i, layer in enumerate(self.neural_net):
+            print("Layer {}".format(i))
+            for j, neuron in enumerate(layer):
+                print("\tNeuron {}, bias: {}".format(j, neuron.bias))
+                if(neuron.output != None):
+                    print("\t\toutput: {}".format(neuron.output))
+                for k, weight in enumerate(neuron.weights):
+                    print("\t\t\tweight: {}".format(weight))
+    
 
-    #TODO the next methods should be in organism class
+    def sum_vectors(self,vector1, vector2):
+        vector3 = []
+        for i in range(len(vector1)):
+            vector3.append(vector1[i]+vector2[i])
+        return vector3
+    
+
+    # ------------------------------------------- Neural Netowrk functions ---------------------------------------------- #
+
+    def get_output(self):
+        output = []
+        for n in self.neural_net[self.number_of_layers-1]:
+            output.append(n.output)
+        return output
+
+
+    def run_net(self):
+        for i in range(self.number_of_layers-1): 
+            sum_results = [0]*self.number_of_neurons_per_layer[i+1]
+            for n in self.neural_net[i]: #para cada neuronio n da layer i atual
+                n.calculate_weights_times_output()
+                result = n.weights_times_output
+                sum_results = self.sum_vectors(sum_results, result)
+            if(i < self.number_of_layers-1):
+                for idx, n in enumerate(self.neural_net[i+1]):
+                    n.set_sum(sum_results[idx])
+                    n.calculate_output()
+
 
     def copy(self):
         new_neural_net = []
@@ -229,48 +270,38 @@ class NeuralNetwork():
         return NeuralNetwork(neural_net=new_neural_net)
 
 
-    def copy_with_mutation(self): #TODO where to mutation things, maybe limit the number of mutation?
-        new_neural_net = []         #TODO refactor. This function is awful
-        new_layer = [] 
-        for neuron in self.neural_net[0]:  
-            sort = random.randint(0,1) #zero or 1
-            new_neuron = neuron.copy() 
-            if(sort == 1 and len(new_neuron.weights)>0): #mutate
-                number_of_mutate_weights = random.randint(0, len(new_neuron.weights))
-                for i in range(number_of_mutate_weights):
-                    idx_mutate = random.randint(0,len(new_neuron.weights)-1)
-                    new_weight = random.uniform(-1,1)
-                    new_neuron.set_weight(idx_mutate,new_weight)
-            new_layer.append(new_neuron)
-        new_neural_net.append(new_layer)
+    def mutate_weights(self, neuron):
+        sort = random.randint(0,1) #zero or 1
+        if(sort == 1): #mutate wegths
+            number_of_mutate_weights = random.randint(0, len(neuron.weights))
+            for i in range(number_of_mutate_weights):
+                idx_mutate = random.randint(0,len(neuron.weights)-1)
+                new_weight = self.get_random_value()
+                neuron.set_weight(idx_mutate,new_weight)
     
-        for layer in self.neural_net[1:-1]:  
+
+    def mutate_bias(self, neuron):
+        sort = random.randint(0,1) #zero or 1
+        if(sort == 1): #mutate wegths
+            neuron.set_bias(self.get_random_value())
+
+
+    def copy_with_mutation(self): #TODO where to mutation things, maybe limit the number of mutation?
+        new_neural_net = []    
+        for k in range(self.neural_net):  
+            layer = self.neural_net[k]
             new_layer = []
             for neuron in layer:
-                sort = random.randint(0,1) #zero or 1
                 new_neuron = neuron.copy() 
-                if(sort == 1): #mutate wegths
-                    number_of_mutate_weights = random.randint(0, len(new_neuron.weights)+1)
-                    for i in range(number_of_mutate_weights):
-                        idx_mutate = random.randint(0,len(new_neuron.weights)-1)
-                        new_weight = random.uniform(-1,1)
-                        new_neuron.set_weight(idx_mutate,new_weight)
-                sort = random.randint(0,1)
-                if(sort==1): #mutate bias
-                    new_neuron.set_bias(random.uniform(-1,1))
+                if(k<self.number_of_layers-1):
+                    self.mutate_bias(new_neuron)
+                if(k>0):
+                    self.mutate_weights(new_neuron)
                 new_layer.append(new_neuron)
             new_neural_net.append(new_layer)
-        new_layer = []
-        for neuron in self.neural_net[-1]:
-            sort = random.randint(0,1) #zero or 1
-            if(sort == 0):
-                new_neuron = neuron.copy() #don't mutate
-            else:
-                new_neuron = neuron.copy()
-                new_neuron.set_bias(random.uniform(-1,1))
-            new_layer.append(new_neuron)
-        new_neural_net.append(new_layer)
         return NeuralNetwork(neural_net = new_neural_net)
+
+    # ------------------------------------------------------------------------------------------------------------------- #
 
 #n = NeuralNetwork(file="my_net.txt")
 #n.print()
