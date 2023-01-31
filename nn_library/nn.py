@@ -112,18 +112,18 @@ class NeuralNetwork():
     # ----------------------------------------- Constructor auxiliary functions -------------------------------------------- #
     
     def select_arguments(self,number_of_neurons_per_layer, neural_net,file):
-        nones = 0
+        not_none = 0
         choosen = 0
-        if(file==None):
-            nones+=1
+        if(file!=None):
             choosen = 1
-        if(number_of_neurons_per_layer==None):
-            nones+=1
+            not_none+=1
+        if(number_of_neurons_per_layer!=None):
             choosen = 2
-        if(neural_net==None):
-            Nones+=1
+            not_none+=1
+        if(neural_net!=None):
             choosen = 3
-        if(nones!=2):
+            not_none+=1
+        if(not_none!=1):
             self.Error("You must choose only one way to create the neural net: from a file, randonly or a given neural neral")
         else:
             return choosen
@@ -168,6 +168,8 @@ class NeuralNetwork():
         self.neural_net.append(layer)
 
 
+    #TODO see if is pssible to write a compact and descompact function to be used by write and read
+    
     def read_nn(self, file):
         #one with number of neurons
         #next n lines, one for one neuron. The first number are bias
@@ -211,6 +213,23 @@ class NeuralNetwork():
     
     # --------------------------------------- Functions for general proposes ------------------------------------------ # 
     
+
+    def write_nn(self,file):
+        compact_nn = []
+        for i in range(self.number_of_layers):
+            layer = self.neural_net[i]
+            len_layer = self.number_of_neurons_per_layer[i]
+            compact_nn.append(str(len_layer))
+            for neuron in layer:
+                infos = str(neuron.get_bias())
+                if(i<self.number_of_layers-1):
+                    infos+=" "
+                    infos+=" ".join(map(str, neuron.get_weights()))
+                compact_nn.append(infos)
+        with open(file, 'w') as f:
+            f.write("\n".join(compact_nn))
+
+
     def Error(self, message):
         raise Exception(message)
     
@@ -303,7 +322,8 @@ class NeuralNetwork():
 
     # ------------------------------------------------------------------------------------------------------------------- #
 
-#n = NeuralNetwork(file="my_net.txt")
+n = NeuralNetwork(file="my_net.txt")
+n.write_nn("out.txt")
 #n.print()
 #n2 = n.copy_with_mutation()
 #n2.print()
