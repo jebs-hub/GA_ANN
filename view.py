@@ -18,8 +18,6 @@ class Food():
     def __init__(self,canvas,color):
         self.start_x = random.randint(0,size_of_board)
         self.start_y = random.randint(0,size_of_board)
-        #self.start_x = 20
-        #self.start_y = 20
         self.x = self.start_x
         self.y = self.start_y
         self.size = food_size
@@ -63,8 +61,6 @@ class OrganismView():
 
         self.start_x = random.randint(20,size_of_board-20)
         self.start_y = random.randint(20,size_of_board-20)
-        #self.start_x = 30
-        #self.start_y = 30
         self.x = self.start_x
         self.y = self.start_x
         self.size = organism_size

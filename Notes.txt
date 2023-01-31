@@ -1,5 +1,5 @@
 TODOS
--> refactor code 
+-> refactor code OK
 -> write doc
 -> function to write reports with valid informations about the survivors 
    (distance from the food and others)
