@@ -85,6 +85,8 @@ class OrganismView():
         self.ancestral = ancestral
         self.score = 0
         self.gen = gen
+        self.succed = False
+        self.all_distance = 0
 
     
     def generate_color(self):
@@ -134,6 +136,10 @@ class OrganismView():
     
     def get_distance(self,point1, point2):
         return math.sqrt(((point1[0]-point2[0])**2+(point1[1]-point2[1])**2))
+    
+
+    def get_linear_distance(self,point1,point2):
+        return abs(point1[0]-point2[0])+abs(point1[1]-point2[1])
     
 
     def isFoodReached(self):
@@ -188,6 +194,7 @@ class OrganismView():
 
 
     def die(self):
+        self.all_distance = self.get_linear_distance([self.start_x, self.start_y],[self.x, self.y])
         time_alive = time.time() - self.start
         self.brain.set_time_alive(time_alive)
         self.dead = True
@@ -202,11 +209,8 @@ class OrganismView():
         brain = self.brain.copy_with_mutation()
         next_gen = self.gen+1
         return OrganismView(self.canvas,id,self.id,next_gen,nn=brain)
-     
-
-    def isSelected(self):
-        if(not self.dead):
-            self.brain.set_time_alive(120)
+    
+    def define_score(self):
         if(self.brain.get_number_of_feeding()>=1):
             initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
             self.score = self.brain.time_alive + 10*self.brain.get_number_of_feeding() + initial_distance//120
@@ -214,15 +218,27 @@ class OrganismView():
             initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
             final_distance = self.get_distance([self.x,self.y],[self.start_xf,self.start_yf])
             self.score = self.brain.time_alive + 10*(initial_distance-final_distance)//initial_distance
-        if((not self.dead) and self.brain.get_number_of_feeding()>=1):
-            return True 
-        else: 
-            return False
+
+    def define_status(self):
+        if(self.brain.get_number_of_feeding()>=1 and self.brain.get_time_alive()>=110):
+            self.succed = True 
     
+    def end(self):
+        if(self.brain.get_number_of_feeding()==0 and not self.isDead()):
+            self.die() 
+        self.define_score()
+        self.define_status()
+
+
+    def survive(self):
+        return self.succed
 
     def remove(self):
         self.canvas.delete(self.circle)
         self.food.eat()
+    
+    def print_report(self):
+        print("{}\t{}\t{:.2}\t       {}\t   {:.2}\t     {}\t           {}".format(self.id,self.succed,float(self.score),self.brain.get_number_of_feeding(),float(self.brain.get_time_alive()), self.all_distance,self.get_linear_distance([self.start_x, self.start_y],[self.start_xf, self.start_yf])))
 
 class environment:
    
@@ -249,20 +265,32 @@ class environment:
             self.window.after(500, self.move)
         self.moves+=1
     
-    def select(self):
-        ok = 0
+    def sort_orgs_by_score(self):
+        pass
+    
+    def print_report(self):
+        succeds = ""
+        print("Generation {}".format(self.gen))
+        print("ID\tSUCCED\tSCORE\tFEEDINGS\tTIME ALIVE\tALL DISTANCE\tIN. DIS. FROM FOOD")
+        self.sort_orgs_by_score()
         for o in self.orgs:
-            if(o.isSelected()):
-                print("SUCCED",o.score, o.brain.number_of_feeding, o.brain.time_alive,o.start_x,o.start_y,o.start_xf,o.start_yf)
-                ok+=1
-        print("survivors: {}, moves: {}".format(ok,self.moves))
+            o.end()
+            if(o.score>=40):
+                o.print_report()
+            if(o.survive()):
+                succeds+=str(o.id)+" "
+        print("SUCCED: {}, moves: {}".format(succeds, self.moves))
+
+
+    def save_report(self, file):
+        pass 
 
     def start(self):
         self.window.after(500, self.move)
         self.start_time = time.time()
         while (time.time()-self.start_time<=120):
             self.window.update()
-        self.select()
+        self.print_report()
 
 game_instance = environment()
 environment.start(game_instance)
