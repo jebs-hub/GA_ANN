@@ -10,8 +10,8 @@ import math
 #Parameters
 size_of_board = 600
 collision_radius = 6.5
-organism_size = 15
-food_size = 7
+organism_size = 7
+food_size = 5
 
 class Food():
 
@@ -92,6 +92,7 @@ class OrganismView():
     def generate_color(self):
         r = lambda: random.randint(0,255)
         return '#%02X%02X%02X' % (r(),r(),r())
+
 
     def input_information(self):
 
@@ -210,7 +211,8 @@ class OrganismView():
         next_gen = self.gen+1
         return OrganismView(self.canvas,id,self.id,next_gen,nn=brain)
     
-    def define_score(self):
+
+    def define_score(self): #TODO review score
         if(self.brain.get_number_of_feeding()>=1):
             initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
             self.score = self.brain.time_alive + 10*self.brain.get_number_of_feeding() + initial_distance//120
@@ -219,10 +221,12 @@ class OrganismView():
             final_distance = self.get_distance([self.x,self.y],[self.start_xf,self.start_yf])
             self.score = self.brain.time_alive + 10*(initial_distance-final_distance)//initial_distance
 
+
     def define_status(self):
         if(self.brain.get_number_of_feeding()>=1 and self.brain.get_time_alive()>=110):
             self.succed = True 
     
+
     def end(self):
         if(self.brain.get_number_of_feeding()==0 and not self.isDead()):
             self.die() 
@@ -233,12 +237,15 @@ class OrganismView():
     def survive(self):
         return self.succed
 
+
     def remove(self):
         self.canvas.delete(self.circle)
         self.food.eat()
     
+
     def print_report(self):
-        print("{}\t{}\t{:.2}\t       {}\t   {:.2}\t     {}\t           {}".format(self.id,self.succed,float(self.score),self.brain.get_number_of_feeding(),float(self.brain.get_time_alive()), self.all_distance,self.get_linear_distance([self.start_x, self.start_y],[self.start_xf, self.start_yf])))
+        print("{}   {}        {:.2f}       {}         {:.2f}         {:03d}             {}".format(self.id,self.succed,float(self.score),self.brain.get_number_of_feeding(),float(self.brain.get_time_alive()), self.all_distance,self.get_linear_distance([self.start_x, self.start_y],[self.start_xf, self.start_yf])))
+
 
 class environment:
    
@@ -261,34 +268,38 @@ class environment:
         for org in self.orgs:
             if(not org.isDead()):
                 org.move()
-        if(time.time()-self.start_time<=120):
+        if(time.time()-self.start_time<=70):
             self.window.after(500, self.move)
         self.moves+=1
     
     def sort_orgs_by_score(self):
         pass
     
-    def print_report(self):
+    def print_report(self): #TODO THINK ABAOUT PARAMETERS TO PASS TO THE FUNCTION AND STRUCTURE IT
         succeds = ""
         print("Generation {}".format(self.gen))
-        print("ID\tSUCCED\tSCORE\tFEEDINGS\tTIME ALIVE\tALL DISTANCE\tIN. DIS. FROM FOOD")
+        print("ID   SUCCED    SCORE     FEEDINGS    TIME ALIVE    ALL DISTANCE   IN. DIS. FROM FOOD")
         self.sort_orgs_by_score()
         for o in self.orgs:
             o.end()
-            if(o.score>=40):
+            if(o.score>=60):
                 o.print_report()
             if(o.survive()):
                 succeds+=str(o.id)+" "
         print("SUCCED: {}, moves: {}".format(succeds, self.moves))
 
 
-    def save_report(self, file):
-        pass 
+    def save_report(self, file):    #TODO CREATE THIS WITH PARAMETERS TO
+        pass                        #create csv with general information 
+                                    #give option for this informations
+
+                                    #TODO function to deal with simulation when it is over
+                                    #sort organisms by values, filter and etc
 
     def start(self):
         self.window.after(500, self.move)
         self.start_time = time.time()
-        while (time.time()-self.start_time<=120):
+        while (time.time()-self.start_time<=70): #TODO define global variable for simulation's duration
             self.window.update()
         self.print_report()
 
