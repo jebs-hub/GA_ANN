@@ -267,7 +267,7 @@ class environment:
     def __init__(self):                          #TODO modify constructor
         self.window = Tk()
         self.window.title("Environment")
-        self.canvas = Canvas(self.window, width=size_of_board, height=size_of_board)
+        self.canvas = Canvas(self.window, width=size_of_board, height=size_of_board)    #TODO check atributes
         self.canvas.pack()
         self.should_stop = False
         self.orgs = []
@@ -289,7 +289,8 @@ class environment:
             self.window.after(500, self.move)
         self.moves+=1
     
-    def sort_orgs_by_score(self):
+    def rank(self):
+        self.orgs.sort(key=lambda x: x.score, reverse=True)
         pass
     
 
@@ -333,27 +334,33 @@ class environment:
         pass 
 
 
-    def construct_gen(self): ##TODO build gen from zero
+    def start_gen(self): ##TODO build gen from zero
         pass    
 
 
-    def reconstruct_gen(self): ##TODO reconstruct gen from files
+    def rebuild_gen(self): ##TODO reconstruct gen from files or specific orgs
         pass    
+    
 
+    def end_simulation(self):
+        for o in self.orgs:
+            if(not o.isDead()):
+                o.die()              
+            o.define_score()
+    
+    #TODO function to print the csv of previous generations
+                    
 
-    def score_and_rank(self): ##TODO score and sort each orgs of previous simulation
-        pass               
-                                     
-
-    def run_gen(self):   ##run evolution
+    def run_simulation(self):   ##run evolution
         self.window.after(500, self.move)
         self.start_time = time.time()
         while (time.time()-self.start_time<=duration):
             self.window.update()
-        self.print_gen_report()
-        self.print_orgs_report()
-        self.print_orgs_brain_report()
 
 
 env = environment()
-env.run_gen()
+env.start_gen()
+env.run_simulation()
+env.end_simulation()
+env.rank()
+env.save_report()
