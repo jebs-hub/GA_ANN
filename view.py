@@ -16,6 +16,7 @@ organism_size = 7
 food_size = 5
 population = 2001
 vel = 10
+duration = 2
 
 class Food():
 
@@ -254,20 +255,23 @@ class OrganismView():
         self.brain.scan(file)
         pass
 
-    def print_report(self):
-        print("{}   {}        {:.2f}       {}         {:.2f}         {:03d}             {}".format(self.id,self.succed,float(self.score),self.brain.get_number_of_feeding(),float(self.brain.get_time_alive()), self.all_distance,self.get_linear_distance([self.start_x, self.start_y],[self.start_xf, self.start_yf])))
+    def print_orgs_report(self):
+        print("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format(self.id,self.score,self.gen,self.ancestral,self.brain.time_alive,self.brain.number_of_feeding,self.start_x,self.start_y,self.start_xf,self.start_yf))
 
+
+    def print_orgs_brain_report(self):
+        self.brain.nn.print()
 
 class environment:
    
-    def __init__(self):
+    def __init__(self):                          #TODO modify constructor
         self.window = Tk()
         self.window.title("Environment")
         self.canvas = Canvas(self.window, width=size_of_board, height=size_of_board)
         self.canvas.pack()
         self.should_stop = False
         self.orgs = []
-        for i in range(1,2001):
+        for i in range(1,population):
             self.orgs.append(OrganismView(self.canvas,i,-1,0,brain=None))
         self.start_time = time.time()
         self.gen = 0
@@ -281,32 +285,35 @@ class environment:
         for org in self.orgs:
             if(not org.isDead()):
                 org.move()
-        if(time.time()-self.start_time<=3):
+        if(time.time()-self.start_time<=duration):
             self.window.after(500, self.move)
         self.moves+=1
     
     def sort_orgs_by_score(self):
         pass
     
-    def print_report(self): #TODO THINK ABAOUT PARAMETERS TO PASS TO THE FUNCTION AND STRUCTURE IT
-        succeds = ""
-        print("Generation {}".format(self.gen))
-        print("ID   SUCCED    SCORE     FEEDINGS    TIME ALIVE    ALL DISTANCE   IN. DIS. FROM FOOD")
-        self.sort_orgs_by_score()
-        for o in self.orgs:
-            o.end()
-            if(o.score>=60):
-                o.print_report()
-            if(o.survive()):
-                succeds+=str(o.id)+" "
-        print("SUCCED: {}, moves: {}".format(succeds, self.moves))
+
+    def print_gen_report(self): #TODO print report in the same format of save report
+        print("gen\tboard size\tpop\tvel\tcoll radius\tmoves\tavg score\tfeeding")
+        print("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format(self.gen,size_of_board,population,vel,collision_radius,self.moves,self.avg,self.feeding))
 
 
-    def save_report(self,n=50): 
-        os.mkdir("./gen"+str(self.gen))
-        file_gen = "./gen"+str(self.gen)+"/gen"+str(self.gen)
+    def print_orgs_report(self,n=10):
+        print("id\tscore\tgen\tancestral\ttime alive\tfeeding\txi\tyi\txfi\tyfi")
+        for i in range(n):
+            self.orgs[i].print_orgs_report()
+    
+
+    def print_orgs_brain_report(self,n=10):
+        for i in range(n):
+            print("ID: {}",self.orgs[i].id)
+            self.orgs[i].print_orgs_brain_report()
+        
+
+    def save_report(self,dir="./",n=50): 
+        os.mkdir(dir+"gen"+str(self.gen))
+        file_gen = dir+"gen"+str(self.gen)+"/gen"+str(self.gen)
         file_orgs = file_gen+"_performance_orgs"
-        print(file_gen, file_orgs)
         with open(file_gen+".csv", 'w') as f:
             writer = csv.writer(f)
             header = ["gen","board size","pop","vel","coll radius","moves","avg score","feeding"]
@@ -323,15 +330,30 @@ class environment:
                 writer.writerow(data)
                 self.orgs[i].brain_for_report(file_gen)
             f.close()
-        pass                        
+        pass 
+
+
+    def construct_gen(self): ##TODO build gen from zero
+        pass    
+
+
+    def reconstruct_gen(self): ##TODO reconstruct gen from files
+        pass    
+
+
+    def score_and_rank(self): ##TODO score and sort each orgs of previous simulation
+        pass               
                                      
 
-    def start(self):
+    def run_gen(self):   ##run evolution
         self.window.after(500, self.move)
         self.start_time = time.time()
-        while (time.time()-self.start_time<=3): #TODO define global variable for simulation's duration
+        while (time.time()-self.start_time<=duration):
             self.window.update()
-        self.save_report(n=10)
+        self.print_gen_report()
+        self.print_orgs_report()
+        self.print_orgs_brain_report()
 
-game_instance = environment()
-environment.start(game_instance)
+
+env = environment()
+env.run_gen()
