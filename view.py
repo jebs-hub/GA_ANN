@@ -6,12 +6,16 @@ import time
 from PIL import ImageTk,Image
 from model import OrganismBrain
 import math
+import csv
+import os
 
 #Parameters
 size_of_board = 600
 collision_radius = 6.5
 organism_size = 7
 food_size = 5
+population = 2001
+vel = 10
 
 class Food():
 
@@ -62,7 +66,7 @@ class OrganismView():
         self.start_x = random.randint(20,size_of_board-20)
         self.start_y = random.randint(20,size_of_board-20)
         self.x = self.start_x
-        self.y = self.start_x
+        self.y = self.start_y
         self.size = organism_size
         self.canvas = canvas
         self.color = self.generate_color()
@@ -242,6 +246,13 @@ class OrganismView():
         self.canvas.delete(self.circle)
         self.food.eat()
     
+    def data_for_report(self):
+        return [self.id,self.score,self.gen,self.ancestral,self.brain.time_alive,self.brain.number_of_feeding,self.start_x,self.start_y,self.start_xf,self.start_yf]
+
+    def brain_for_report(self,prefix):
+        file = prefix+"_brain_scan_id"+str(self.id)
+        self.brain.scan(file)
+        pass
 
     def print_report(self):
         print("{}   {}        {:.2f}       {}         {:.2f}         {:03d}             {}".format(self.id,self.succed,float(self.score),self.brain.get_number_of_feeding(),float(self.brain.get_time_alive()), self.all_distance,self.get_linear_distance([self.start_x, self.start_y],[self.start_xf, self.start_yf])))
@@ -261,6 +272,8 @@ class environment:
         self.start_time = time.time()
         self.gen = 0
         self.moves = 0
+        self.avg = 0
+        self.feeding = 0
         #self.ret = self.canvas.create_rectangle(0, 0, 10, size_of_board, fill='green')
     
 
@@ -268,7 +281,7 @@ class environment:
         for org in self.orgs:
             if(not org.isDead()):
                 org.move()
-        if(time.time()-self.start_time<=70):
+        if(time.time()-self.start_time<=3):
             self.window.after(500, self.move)
         self.moves+=1
     
@@ -289,19 +302,36 @@ class environment:
         print("SUCCED: {}, moves: {}".format(succeds, self.moves))
 
 
-    def save_report(self, file):    #TODO CREATE THIS WITH PARAMETERS TO
-        pass                        #create csv with general information 
-                                    #give option for this informations
-
-                                    #TODO function to deal with simulation when it is over
-                                    #sort organisms by values, filter and etc
+    def save_report(self,n=50): 
+        os.mkdir("./gen"+str(self.gen))
+        file_gen = "./gen"+str(self.gen)+"/gen"+str(self.gen)
+        file_orgs = file_gen+"_performance_orgs"
+        print(file_gen, file_orgs)
+        with open(file_gen+".csv", 'w') as f:
+            writer = csv.writer(f)
+            header = ["gen","board size","pop","vel","coll radius","moves","avg score","feeding"]
+            writer.writerow(header)
+            data = [self.gen,size_of_board,population,vel,collision_radius,self.moves,self.avg,self.feeding]
+            writer.writerow(data)
+            f.close()
+        with open(file_orgs+".csv", 'w') as f:
+            writer = csv.writer(f)
+            header = ["id","score","gen","ancestral","time alive","feeding","xi","yi","xfi","yfi"]
+            writer.writerow(header)
+            for i in range(n):
+                data = self.orgs[i].data_for_report()
+                writer.writerow(data)
+                self.orgs[i].brain_for_report(file_gen)
+            f.close()
+        pass                        
+                                     
 
     def start(self):
         self.window.after(500, self.move)
         self.start_time = time.time()
-        while (time.time()-self.start_time<=70): #TODO define global variable for simulation's duration
+        while (time.time()-self.start_time<=3): #TODO define global variable for simulation's duration
             self.window.update()
-        self.print_report()
+        self.save_report(n=10)
 
 game_instance = environment()
 environment.start(game_instance)

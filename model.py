@@ -60,3 +60,6 @@ class OrganismBrain:
             return "right"
         if(idx==3):
             return "left"
+    
+    def scan(self,file):
+        self.nn.write_nn(file)

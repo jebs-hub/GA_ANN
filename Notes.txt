@@ -18,3 +18,7 @@ PROBLEMS
     The population is not growing, always one survive
     Dificulty to choose the initial range for weights and biases (|10| -> |1|)
     Dificulty to choose which inputs and outputs are better for the net 
+
+Informations in report:
+
+id,score,gen,ancestral,time alive,feeding,initial position,initial position food 
