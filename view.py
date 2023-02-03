@@ -60,7 +60,7 @@ class Poison():
 
 class OrganismView(): 
                                                        
-    def __init__(self,canvas,id,ancestral,gen,brain=None):
+    def __init__(self,canvas,id,ancestral,gen,brain=None,path=None):
         
         #canvas set up
 
@@ -73,10 +73,12 @@ class OrganismView():
         self.color = self.generate_color()
         self.circle = self.canvas.create_oval(self.start_x, self.start_y, self.start_x+self.size, self.start_y+self.size, fill=self.color)
         
-        if(brain==None):
-            self.brain = OrganismBrain()
-        else:
+        if(brain!=None):
             self.brain = brain
+        elif(path!=None):
+            self.brain = OrganismBrain(path=path)
+        else:
+            self.brain = OrganismBrain()
 
         self.food = Food(self.canvas,self.color)
         self.start_xf = self.food.start_x
@@ -269,16 +271,12 @@ class environment:
         self.window.title("Environment")
         self.canvas = Canvas(self.window, width=size_of_board, height=size_of_board)    #TODO check atributes
         self.canvas.pack()
-        self.should_stop = False
         self.orgs = []
-        for i in range(1,population):
-            self.orgs.append(OrganismView(self.canvas,i,-1,0,brain=None))
         self.start_time = time.time()
         self.gen = 0
         self.moves = 0
         self.avg = 0
         self.feeding = 0
-        #self.ret = self.canvas.create_rectangle(0, 0, 10, size_of_board, fill='green')
     
 
     def move(self):
@@ -311,10 +309,11 @@ class environment:
             self.orgs[i].print_orgs_brain_report()
         
 
-    def save_report(self,dir="./",n=50): 
-        os.mkdir(dir+"gen"+str(self.gen))
+    def save_report(self,dir="",n=50): 
+        os.makedirs(dir+"gen"+str(self.gen)+"/brains",exist_ok=True)
         file_gen = dir+"gen"+str(self.gen)+"/gen"+str(self.gen)
         file_orgs = file_gen+"_performance_orgs"
+        file_brain = dir+"gen"+str(self.gen)+"/brains"+"/gen"+str(self.gen)
         with open(file_gen+".csv", 'w') as f:
             writer = csv.writer(f)
             header = ["gen","board size","pop","vel","coll radius","moves","avg score","feeding"]
@@ -329,16 +328,16 @@ class environment:
             for i in range(n):
                 data = self.orgs[i].data_for_report()
                 writer.writerow(data)
-                self.orgs[i].brain_for_report(file_gen)
+                self.orgs[i].brain_for_report(file_brain)
             f.close()
-        pass 
 
 
-    def start_gen(self): ##TODO build gen from zero
-        pass    
+    def start_gen(self): 
+        for i in range(1,population):
+            self.orgs.append(OrganismView(self.canvas,i,-1,0,brain=None))
 
 
-    def rebuild_gen(self): ##TODO reconstruct gen from files or specific orgs
+    def rebuild_gen(self,file): ##TODO reconstruct gen from files or specific orgs
         pass    
     
 
@@ -356,6 +355,7 @@ class environment:
         self.start_time = time.time()
         while (time.time()-self.start_time<=duration):
             self.window.update()
+        self.save_report()
 
 
 env = environment()

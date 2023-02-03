@@ -5,13 +5,15 @@ nn_eskeleton = [8,6,4] #default neural net for our model
 class OrganismBrain:
     
 
-    def __init__(self,neural_net=None):
+    def __init__(self,neural_net=None,path=None):
         self.number_of_feeding = 0
         self.time_alive = 0
-        if(neural_net == None):
-            self.nn = NeuralNetwork(number_of_neurons_per_layer=nn_eskeleton)
-        else: 
+        if(neural_net != None):
             self.nn = neural_net
+        elif(path!=None): 
+            self.nn = NeuralNetwork(file=path)
+        else:
+            self.nn = NeuralNetwork(number_of_neurons_per_layer=nn_eskeleton)
 
 
     def increment_number_of_feeding(self):
