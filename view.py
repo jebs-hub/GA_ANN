@@ -70,6 +70,8 @@ class OrganismView():
         self.canvas = canvas
         self.start = time.time()
         self.dead = False
+        self.previous_move = None
+        self.brownian = False
     
 
     def rise(self,gen,id,ancestral,brain=None):
@@ -191,17 +193,31 @@ class OrganismView():
         if(direction=="up"):
             self.y -= 10
             steps_y = -10
+            if(self.previous_move=="down"):
+                self.brownian = True
+                self.die()
         elif(direction=="down"):
             self.y += 10
             steps_y = 10
+            if(self.previous_move=="up"):
+                self.brownian = True
+                self.die()
         elif(direction=="right"):
             self.x += 10
             steps_x = 10
+            if(self.previous_move=="left"):
+                self.brownian = True
+                self.die()
         elif(direction=="left"):
+            if(self.previous_move=="right"):
+                self.brownian = True
+                self.die()
             self.x -= 10
             steps_x = -10
         else:
             print("no COMMAND")
+        
+        self.previous_move = direction
 
         # if outside screen, organism dies
         if(self.isOutOfBounds()):
@@ -210,6 +226,7 @@ class OrganismView():
             self.canvas.move(self.circle, steps_x, steps_y)
             if(self.isFoodReached()):
                 self.feed()
+                self.previous_move = None
 
     
     def feed(self):
@@ -246,7 +263,6 @@ class OrganismView():
             initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
             final_distance = self.get_distance([self.x,self.y],[self.start_xf,self.start_yf])
             self.score = self.brain.time_alive + 10*(initial_distance-final_distance)//initial_distance
-
 
     def define_status(self):
         if(self.brain.get_number_of_feeding()>=1 and self.brain.get_time_alive()>=110):
@@ -387,8 +403,6 @@ class environment:
                 else:
                     first = False
 
-        
-
     def end_simulation(self):
         for o in self.orgs:
             if(not o.isDead()):
@@ -400,7 +414,7 @@ class environment:
         
         self.window.after(500, self.move)
         self.start_time = time.time()
-        while (time.time()-self.start_time<=duration):
+        while (time.time()-self.start_time<=duration and not len(self.orgs)==0):
             self.window.update()
 
 
@@ -409,7 +423,7 @@ env = environment()
 #env.run_simulation()
 #env.end_simulation()
 #env.rank()
-#env.save_report()
+#env.save_report(n=10)
 env.rebuild_gen("gen0")
 env.run_simulation()
-env.print_gen_report()
+env.end_simulation()
