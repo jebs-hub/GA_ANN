@@ -1,24 +1,9 @@
 TODOS
--> refactor code OK
 -> write doc
--> function to write reports with valid informations about the survivors 
-   (distance from the food and others)
--> Function to write data to be read after and continue the selection through days (save state) OK
-
+-> refactor to separate view and create a train mode
+-> show the id in the screen with orgs
+-> branch to deal with generations 
 -> write problems faced and changes of plans
 -> Create fitness score to select more people
 -> change the way distance is calculated 
--> explore the magnitude of sizes that I'm using
--> prevent organisms to begin in the wall
--> why are there still organisms?
 -> better way to get the output: I am just getting the bigger one
-
-
-PROBLEMS
-    The population is not growing, always one survive
-    Dificulty to choose the initial range for weights and biases (|10| -> |1|)
-    Dificulty to choose which inputs and outputs are better for the net 
-
-Informations in report:
-
-id,score,gen,ancestral,time alive,feeding,initial position,initial position food 

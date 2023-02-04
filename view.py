@@ -10,13 +10,13 @@ import csv
 import os
 
 #Parameters
-size_of_board = 600
-collision_radius = 6.5
+size_of_board = 500
+collision_radius = 15
 organism_size = 7
 food_size = 5
 population = 2001
 vel = 10
-duration = 2
+duration = 70
 
 class Food():
 
@@ -64,35 +64,12 @@ class Poison():
 
 class OrganismView(): 
                                                        
-    def __init__(self,canvas):
+    def __init__(self,canvas):   #TODO refactor the constructor with the two functions
         
-        #canvas set up
-
-        self.start_x = 0
-        self.start_y = 0
-        self.x = 0
-        self.y = 0
         self.size = organism_size
         self.canvas = canvas
-        self.color = 0
-        self.circle = 0
-        
-        self.brain = 0
-
-        self.food = 0
-        self.start_xf = 0
-        self.start_yf = 0
-        
-        #set up important information
-
-        self.dead = 0
-        self.start = 0
-        self.id = 0
-        self.ancestral = 0
-        self.score = 0
-        self.gen = 0
-        self.succed = 0
-        self.all_distance = 0
+        self.start = time.time()
+        self.dead = False
     
 
     def rise(self,gen,id,ancestral,brain=None):
@@ -101,7 +78,6 @@ class OrganismView():
         self.start_y = random.randint(20,size_of_board-20)
         self.x = self.start_x
         self.y = self.start_y
-        self.size = organism_size
         
         self.color = self.generate_color()
         self.circle = self.canvas.create_oval(self.start_x, self.start_y, self.start_x+self.size, self.start_y+self.size, fill=self.color)
@@ -114,17 +90,12 @@ class OrganismView():
         self.food = Food(self.canvas,self.color)
         self.start_xf = self.food.start_x
         self.start_yf = self.food.start_y
-        
-        #set up important information
 
-        self.dead = False
-        self.start = time.time()
         self.id = id
         self.ancestral = ancestral
         self.score = 0
         self.gen = gen
-        self.succed = False
-        self.all_distance = 0
+        self.feeding = 0
 
 
     def rebuild(self,data,path):
@@ -137,16 +108,14 @@ class OrganismView():
         self.feeding = int(data[5])
         self.start_x = int(data[6])
         self.start_y = int(data[7])
+        self.x = int(data[6])
+        self.y = int(data[7])
         self.start_xf = int(data[8])
         self.start_yf = int(data[9])
         self.color = self.generate_color()
         self.circle = self.canvas.create_oval(self.start_x, self.start_y, self.start_x+self.size, self.start_y+self.size, fill=self.color)
         self.brain = OrganismBrain(path=file)
         self.food = Food(self.canvas,self.color,self.start_xf,self.start_yf)
-        self.dead = False
-        self.start = time.time()
-        self.succed = False
-        self.all_distance = 0
 
 
     
@@ -251,7 +220,6 @@ class OrganismView():
 
 
     def die(self):
-        self.all_distance = self.get_linear_distance([self.start_x, self.start_y],[self.x, self.y])
         time_alive = time.time() - self.start
         self.brain.set_time_alive(time_alive)
         self.dead = True
@@ -317,11 +285,9 @@ class OrganismView():
 
 class environment:
    
-    def __init__(self):                          #TODO modify constructor
+    def __init__(self):        #TODO modify constructor
         self.window = Tk()
         self.window.title("Environment")
-        self.canvas = Canvas(self.window, width=size_of_board, height=size_of_board)    #TODO check atributes
-        self.canvas.pack()
         self.orgs = []
         self.start_time = time.time()
         self.gen = 0
@@ -337,6 +303,7 @@ class environment:
         if(time.time()-self.start_time<=duration):
             self.window.after(500, self.move)
         self.moves+=1
+    
     
     def rank(self):
         self.orgs.sort(key=lambda x: x.score, reverse=True)
@@ -384,13 +351,31 @@ class environment:
 
 
     def start_gen(self): 
+        self.canvas = Canvas(self.window, width=size_of_board, height=size_of_board)   
+        self.canvas.pack()
         for i in range(1,population):
             new = OrganismView(self.canvas)
             new.rise(0,i,-1,brain=None)
             self.orgs.append(new)
 
 
-    def rebuild_gen(self,path_gen): ##TODO reconstruct gen from files or specific orgs 
+    def rebuild_gen(self,path_gen):
+        global size_of_board, population, vel, collision_radius
+        with open(path_gen+"/resume.csv","r") as file:
+            csvreader = csv.reader(file)
+            data = []
+            for row in csvreader:
+                data = row 
+            self.gen = int(data[0])        
+            size_of_board = int(data[1])
+            population = int(data[2])
+            vel = int(data[3])
+            collision_radius = float(data[4])
+            self.moves = int(data[5])
+            self.avg = float(data[6])
+            self.feeding = int(data[7])
+        self.canvas = Canvas(self.window, width=size_of_board, height=size_of_board)  
+        self.canvas.pack()
         with open(path_gen+"/performances.csv", 'r') as file:
             csvreader = csv.reader(file)
             first = True
@@ -401,6 +386,7 @@ class environment:
                     self.orgs.append(new)
                 else:
                     first = False
+
         
 
     def end_simulation(self):
@@ -408,11 +394,10 @@ class environment:
             if(not o.isDead()):
                 o.die()              
             o.define_score()
-    
-    #TODO function to print the csv of previous generations
                     
 
     def run_simulation(self):   ##run evolution
+        
         self.window.after(500, self.move)
         self.start_time = time.time()
         while (time.time()-self.start_time<=duration):
@@ -427,3 +412,4 @@ env = environment()
 #env.save_report()
 env.rebuild_gen("gen0")
 env.run_simulation()
+env.print_gen_report()
