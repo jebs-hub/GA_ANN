@@ -75,8 +75,8 @@ class Neuron():
         if(self.activate_function=="reLU"):
             if(self.output < 0):
                 self.output = 0
-            elif(self.output>30):
-                self.output = 30
+            elif(self.output>170):
+                self.output = 236
         else:
             self.output = 1/(1 + math.exp(-self.output))
         return self.output
@@ -169,6 +169,13 @@ class NeuralNetwork():
 
 
     #TODO see if is pssible to write a compact and descompact function to be used by write and read
+
+    def  isfloat(self,value):
+        try:
+            float(value)
+        except:
+            return False 
+        return True
     
     def read_nn(self, file):
         #one with number of neurons
@@ -188,16 +195,16 @@ class NeuralNetwork():
             elif(count_neurons < number_of_neurons):
                 count_neurons+=1
                 values = line.split(" ")
-                if(values[0].isnumeric()):
-                    bias = int(values[0])
+                if(self.isfloat(values[0])):
+                    bias = float(values[0])
                 else:
                     bias = None
                 weights = values[1:]
-                weights = [int(w) for w in weights]
+                weights = [float(w) for w in weights]
                 if(weights==[]):   
-                    neuron = Neuron(bias, weights)
-                else:
                     neuron = Neuron(bias, weights, "sigmoid")
+                else:
+                    neuron = Neuron(bias, weights)
                 layer.append(neuron)
             elif(count_neurons == number_of_neurons):
                 neural_net.append(layer)
@@ -327,11 +334,11 @@ class NeuralNetwork():
 
     # ------------------------------------------------------------------------------------------------------------------- #
 
-#n = NeuralNetwork(file="my_net.txt")
-#n.write_nn("out.txt")
+#n = NeuralNetwork(file="gen0/brains/309")
+#n.write_nn("test.txt")
 #n.print()
 #n2 = n.copy_with_mutation()
 #n2.print()
-#n.input_data([1,1])
+#n.input_data([-571,519])
 #n.run_net()
 #print(n.get_output())

@@ -1,6 +1,6 @@
 from nn_library.nn import NeuralNetwork
 
-nn_eskeleton = [8,6,4] #default neural net for our model
+nn_eskeleton = [2,3,4] #default neural net for our model
 
 class OrganismBrain:
     

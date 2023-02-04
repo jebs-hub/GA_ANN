@@ -20,9 +20,13 @@ duration = 2
 
 class Food():
 
-    def __init__(self,canvas,color):
-        self.start_x = random.randint(0,size_of_board)
-        self.start_y = random.randint(0,size_of_board)
+    def __init__(self,canvas,color,xi=None,yi=None):
+        if(xi!=None):
+            self.start_x = xi 
+            self.start_y = yi
+        else:
+            self.start_x = random.randint(0,size_of_board)
+            self.start_y = random.randint(0,size_of_board)
         self.x = self.start_x
         self.y = self.start_y
         self.size = food_size
@@ -60,23 +64,50 @@ class Poison():
 
 class OrganismView(): 
                                                        
-    def __init__(self,canvas,id,ancestral,gen,brain=None,path=None):
+    def __init__(self,canvas):
         
         #canvas set up
 
+        self.start_x = 0
+        self.start_y = 0
+        self.x = 0
+        self.y = 0
+        self.size = organism_size
+        self.canvas = canvas
+        self.color = 0
+        self.circle = 0
+        
+        self.brain = 0
+
+        self.food = 0
+        self.start_xf = 0
+        self.start_yf = 0
+        
+        #set up important information
+
+        self.dead = 0
+        self.start = 0
+        self.id = 0
+        self.ancestral = 0
+        self.score = 0
+        self.gen = 0
+        self.succed = 0
+        self.all_distance = 0
+    
+
+    def rise(self,gen,id,ancestral,brain=None):
+        
         self.start_x = random.randint(20,size_of_board-20)
         self.start_y = random.randint(20,size_of_board-20)
         self.x = self.start_x
         self.y = self.start_y
         self.size = organism_size
-        self.canvas = canvas
+        
         self.color = self.generate_color()
         self.circle = self.canvas.create_oval(self.start_x, self.start_y, self.start_x+self.size, self.start_y+self.size, fill=self.color)
         
         if(brain!=None):
             self.brain = brain
-        elif(path!=None):
-            self.brain = OrganismBrain(path=path)
         else:
             self.brain = OrganismBrain()
 
@@ -95,6 +126,29 @@ class OrganismView():
         self.succed = False
         self.all_distance = 0
 
+
+    def rebuild(self,data,path):
+        file = path+"/brains/"+data[0]
+        self.id = int(data[0])
+        self.score = float(data[1])
+        self.gen = int(data[2])
+        self.ancestral = int(data[3])
+        self.time_alive = float(data[4])
+        self.feeding = int(data[5])
+        self.start_x = int(data[6])
+        self.start_y = int(data[7])
+        self.start_xf = int(data[8])
+        self.start_yf = int(data[9])
+        self.color = self.generate_color()
+        self.circle = self.canvas.create_oval(self.start_x, self.start_y, self.start_x+self.size, self.start_y+self.size, fill=self.color)
+        self.brain = OrganismBrain(path=file)
+        self.food = Food(self.canvas,self.color,self.start_xf,self.start_yf)
+        self.dead = False
+        self.start = time.time()
+        self.succed = False
+        self.all_distance = 0
+
+
     
     def generate_color(self):
         r = lambda: random.randint(0,255)
@@ -103,20 +157,15 @@ class OrganismView():
 
     def input_information(self):
 
-        d_wall_up = self.y
-        d_wall_down = size_of_board-self.y
-        d_wall_right = size_of_board-self.x
-        d_wall_left = self.x
-
         d_food_up = self.y-self.food.get_y()
         d_food_right = self.food.get_x()-self.x
 
-        self.brain.get_environment_info([d_wall_up,d_wall_down,d_wall_right,d_wall_left,d_food_up,-d_food_up,d_food_right,-d_food_right])
+        self.brain.get_environment_info([d_food_up,d_food_right])
     
 
     def reaction(self):
         return self.brain.response()
-    
+
 
     def set_x(self,x):
         self.x = x
@@ -216,7 +265,9 @@ class OrganismView():
     def reproduce(self, id):
         brain = self.brain.copy_with_mutation()
         next_gen = self.gen+1
-        return OrganismView(self.canvas,id,self.id,next_gen,nn=brain)
+        new = OrganismView(self.canvas)
+        new.rise(next_gen,id,self.id,brain=brain)
+        return new
     
 
     def define_score(self): #TODO review score
@@ -253,7 +304,7 @@ class OrganismView():
         return [self.id,self.score,self.gen,self.ancestral,self.brain.time_alive,self.brain.number_of_feeding,self.start_x,self.start_y,self.start_xf,self.start_yf]
 
     def brain_for_report(self,prefix):
-        file = prefix+"_brain_scan_id"+str(self.id)
+        file = prefix+"/"+str(self.id)
         self.brain.scan(file)
         pass
 
@@ -311,9 +362,9 @@ class environment:
 
     def save_report(self,dir="",n=50): 
         os.makedirs(dir+"gen"+str(self.gen)+"/brains",exist_ok=True)
-        file_gen = dir+"gen"+str(self.gen)+"/gen"+str(self.gen)
-        file_orgs = file_gen+"_performance_orgs"
-        file_brain = dir+"gen"+str(self.gen)+"/brains"+"/gen"+str(self.gen)
+        file_gen = dir+"gen"+str(self.gen)+"/resume"
+        file_orgs = dir+"gen"+str(self.gen)+"/performances"
+        file_brain = dir+"gen"+str(self.gen)+"/brains"
         with open(file_gen+".csv", 'w') as f:
             writer = csv.writer(f)
             header = ["gen","board size","pop","vel","coll radius","moves","avg score","feeding"]
@@ -334,12 +385,23 @@ class environment:
 
     def start_gen(self): 
         for i in range(1,population):
-            self.orgs.append(OrganismView(self.canvas,i,-1,0,brain=None))
+            new = OrganismView(self.canvas)
+            new.rise(0,i,-1,brain=None)
+            self.orgs.append(new)
 
 
-    def rebuild_gen(self,file): ##TODO reconstruct gen from files or specific orgs
-        pass    
-    
+    def rebuild_gen(self,path_gen): ##TODO reconstruct gen from files or specific orgs 
+        with open(path_gen+"/performances.csv", 'r') as file:
+            csvreader = csv.reader(file)
+            first = True
+            for row in csvreader:
+                if(not first):
+                    new = OrganismView(self.canvas)
+                    new.rebuild(row,path_gen)
+                    self.orgs.append(new)
+                else:
+                    first = False
+        
 
     def end_simulation(self):
         for o in self.orgs:
@@ -355,12 +417,13 @@ class environment:
         self.start_time = time.time()
         while (time.time()-self.start_time<=duration):
             self.window.update()
-        self.save_report()
 
 
 env = environment()
-env.start_gen()
+#env.start_gen()
+#env.run_simulation()
+#env.end_simulation()
+#env.rank()
+#env.save_report()
+env.rebuild_gen("gen0")
 env.run_simulation()
-env.end_simulation()
-env.rank()
-env.save_report()
