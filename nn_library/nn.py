@@ -319,7 +319,7 @@ class NeuralNetwork():
 
     def copy_with_mutation(self): #TODO where to mutation things, maybe limit the number of mutation?
         new_neural_net = []    
-        for k in range(self.neural_net):  
+        for k in range(len(self.neural_net)):  
             layer = self.neural_net[k]
             new_layer = []
             for neuron in layer:

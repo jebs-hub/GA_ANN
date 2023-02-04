@@ -193,22 +193,30 @@ class OrganismView():
         if(direction=="up"):
             self.y -= 10
             steps_y = -10
+            if(self.food.get_y()<self.x):
+                self.score+=1
             if(self.previous_move=="down"):
                 self.brownian = True
                 self.die()
         elif(direction=="down"):
+            if(self.food.get_y()>self.x):
+                self.score+=1
             self.y += 10
             steps_y = 10
             if(self.previous_move=="up"):
                 self.brownian = True
                 self.die()
         elif(direction=="right"):
+            if(self.food.get_x()>self.x):
+                self.score+=1
             self.x += 10
             steps_x = 10
             if(self.previous_move=="left"):
                 self.brownian = True
                 self.die()
         elif(direction=="left"):
+            if(self.food.get_x()<self.x):
+                self.score+=1
             if(self.previous_move=="right"):
                 self.brownian = True
                 self.die()
@@ -256,13 +264,14 @@ class OrganismView():
     
 
     def define_score(self): #TODO review score
-        if(self.brain.get_number_of_feeding()>=1):
-            initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
-            self.score = self.brain.time_alive + 10*self.brain.get_number_of_feeding() + initial_distance//120
-        else:
-            initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
-            final_distance = self.get_distance([self.x,self.y],[self.start_xf,self.start_yf])
-            self.score = self.brain.time_alive + 10*(initial_distance-final_distance)//initial_distance
+        #if(self.brain.get_number_of_feeding()>=1):
+            #initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
+            #self.score = self.brain.time_alive + 10*self.brain.get_number_of_feeding() + initial_distance//120
+        #else:
+            #initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
+            #final_distance = self.get_distance([self.x,self.y],[self.start_xf,self.start_yf])
+            #self.score = self.brain.time_alive + 10*(initial_distance-final_distance)//initial_distance
+        pass
 
     def define_status(self):
         if(self.brain.get_number_of_feeding()>=1 and self.brain.get_time_alive()>=110):
@@ -408,13 +417,25 @@ class environment:
             if(not o.isDead()):
                 o.die()              
             o.define_score()
-                    
+    
+    def grow_pop(self):
+        c = 1
+        self.gen+=2
+        count = len(self.orgs)
+        desc = population//count 
+        next = []
+        for i in self.orgs:
+            for j in range(desc):
+                next.append(i.reproduce(c))
+                c+=1
+        self.orgs = next
+
 
     def run_simulation(self):   ##run evolution
         
         self.window.after(500, self.move)
         self.start_time = time.time()
-        while (time.time()-self.start_time<=duration and not len(self.orgs)==0):
+        while (time.time()-self.start_time<=duration):
             self.window.update()
 
 
@@ -424,6 +445,9 @@ env = environment()
 #env.end_simulation()
 #env.rank()
 #env.save_report(n=10)
-env.rebuild_gen("gen0")
+env.rebuild_gen("gen3")
+#env.grow_pop()
 env.run_simulation()
-env.end_simulation()
+#env.end_simulation()
+#env.rank()
+#env.save_report(n=10)
