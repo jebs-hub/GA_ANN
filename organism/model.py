@@ -90,6 +90,7 @@ class OrgsModel:
         self.nn.input_data([self.xf,self.yf])
         self.nn.run_net()
         output = self.nn.get_output()
+        print(output)
         max = output[0]
         idx = 0
         stepsx = 0
@@ -101,15 +102,19 @@ class OrgsModel:
         if(idx==0): #up
             self.y -= 10
             stepsy = -10
+            #print("up")
         if(idx==1):
             self.y += 10
             stepsy = +10
+            #print("down")
         if(idx==2):
             self.x += 10
             stepsx = +10
+            #print("right")
         if(idx==3):
             self.x -= 10
             stepsx = -10
+            #print("left")
         if(self.isOutOfBounds()):
             self.die()
         else:
