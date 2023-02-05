@@ -1,7 +1,6 @@
 TODOS
 
 MORE IMPORTANT
--> refactor to separate view and create a train mode (break org class)
 -> to deal with generations 
 -> to analyze grade methods
 

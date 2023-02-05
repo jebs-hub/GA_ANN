@@ -269,12 +269,10 @@ class NeuralNetwork():
         output = []
         for n in self.neural_net[self.number_of_layers-1]:
             output.append(n.output)
-        print(output)
         return output
     
     
     def input_data(self, data):
-        print(data)
         for i in range(len(data)):
             self.neural_net[0][i].set_output(data[i])
 
