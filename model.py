@@ -48,6 +48,7 @@ class OrganismBrain:
     def response(self):
         self.nn.run_net()
         output = self.nn.get_output()
+        print(output)
         max = output[0]
         idx = 0
         for i in range(len(output)):
