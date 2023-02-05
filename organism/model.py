@@ -14,18 +14,19 @@ class OrgsModel:
         self.start = time.time()
         self.dead = False
         self.coll_radius = coll_radius
+        self.fed = False
 
     
-    def rise(self,gen,id,ancestral,xfi,yfi,neural_net=None):
+    def rise(self,gen,id,ancestral,neural_net=None):
         
         self.start_x = random.randint(20,self.size_env-20)
         self.start_y = random.randint(20,self.size_env-20)
         self.x = self.start_x
         self.y = self.start_y
-        self.start_xf = xfi
-        self.start_yf = yfi
-        self.xf = xfi 
-        self.yf = yfi
+        self.start_xf = random.randint(20,self.size_env-20)
+        self.start_yf = random.randint(20,self.size_env-20)
+        self.xf = self.start_xf
+        self.yf = self.start_yf
         
         if(neural_net!=None):
             self.nn = neural_net
@@ -85,30 +86,31 @@ class OrgsModel:
 
     
     def move(self):
+        self.fed = False
         self.nn.input_data([self.xf,self.yf])
         self.nn.run_net()
         output = self.nn.get_output()
         max = output[0]
         idx = 0
-        steps_x = 0
-        steps_y = 0
         for i in range(len(output)):
             if(output[i]>max):
                 max == output[i]
                 idx = i
         if(idx==0): #up
             self.y -= 10
-            steps_y = -10
         if(idx==1):
             self.y += 10
-            steps_y = +10
         if(idx==2):
             self.x += 10
-            steps_x = +10
         if(idx==3):
             self.x += 10
-            steps_x = +10
-        return [steps_x, steps_y]
+        if(self.isOutOfBounds()):
+            self.die()
+        else:
+            if(self.isFoodReached()):
+                self.feeding+=1
+                self.fed = True
+                self.new_food_coords()
 
     
     def isFoodReached(self):
@@ -153,6 +155,10 @@ class OrgsModel:
 
     def get_distance(self,point1, point2):
         return math.sqrt(((point1[0]-point2[0])**2+(point1[1]-point2[1])**2))
+    
+
+    def get_linear_distance(self,point1,point2):
+        return abs(point1[0]-point2[0])+abs(point1[1]-point2[1])
 
 
     def define_score(self): #TODO review score
@@ -167,12 +173,12 @@ class OrgsModel:
     
 
     def data_for_report(self):
-        return [self.id,self.score,self.gen,self.ancestral,self.time_alive,self.number_of_feeding,self.start_x,self.start_y,self.start_xf,self.start_yf]
+        return [self.id,self.score,self.gen,self.ancestral,self.time_alive,self.feeding,self.start_x,self.start_y,self.start_xf,self.start_yf]
     
 
     def brain_for_report(self,prefix):
         file = prefix+"/"+str(self.id)
-        self.brain.scan(file)
+        self.scan(file)
         pass
 
 
@@ -184,6 +190,9 @@ class OrgsModel:
         self.nn.print()
 
     
-    def set_food_coords(self,xf,yf):
-        self.xf = xf
-        self.yf = yf
+    def get_food_coords(self):
+        return [self.xf,self.yf]
+    
+    def new_food_coords(self):
+        self.start_xf = random.randint(20,self.size_env-20)
+        self.start_yf = random.randint(20,self.size_env-20)

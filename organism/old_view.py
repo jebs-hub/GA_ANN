@@ -1,10 +1,8 @@
-#interface gráfica da evolução
-
 from tkinter import *
 import random
 import time
 from PIL import ImageTk,Image
-from model import OrganismBrain
+from nn_library.organism.model import OrganismBrain
 import math
 import csv
 import os

@@ -1,9 +1,14 @@
 TODOS
+
+MORE IMPORTANT
+-> refactor to separate view and create a train mode (break org class)
+-> to deal with generations 
+-> to analyze grade methods
+
+
+
 -> write doc
--> refactor to separate view and create a train mode
 -> show the id in the screen with orgs
--> branch to deal with generations 
 -> write problems faced and changes of plans
--> Create fitness score to select more people
 -> change the way distance is calculated 
 -> better way to get the output: I am just getting the bigger one
