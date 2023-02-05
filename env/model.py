@@ -121,7 +121,7 @@ class EnvModel:
     
     
     def rank(self):
-        self.orgs.sort(key=lambda x: x.model.score, reverse=True)
+        self.orgs.sort(key=lambda x: x.model.feeding, reverse=True)
         pass
 
     def end_simulation(self):
