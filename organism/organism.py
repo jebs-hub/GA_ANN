@@ -1,4 +1,4 @@
-from model import OrgsModel
+from organism.model import OrgsModel
 
 class Organism():
     

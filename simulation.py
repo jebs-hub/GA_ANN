@@ -1,0 +1,10 @@
+from env.model import environment
+env = environment(500,2000,10,10,3)
+#env.start_gen()
+#env.run_simulation()
+#env.end_simulation()
+#env.rank()
+#env.save_report()
+env.rebuild_gen("gen0")
+env.run_simulation()
+env.print_gen_report()
