@@ -90,7 +90,6 @@ class OrgsModel:
         self.nn.input_data([self.xf,self.yf])
         self.nn.run_net()
         output = self.nn.get_output()
-        print(output)
         max = output[0]
         idx = 0
         stepsx = 0
@@ -122,7 +121,6 @@ class OrgsModel:
                 self.feeding+=1
                 self.fed = True
                 self.new_food_coords()
-        print(self.x,self.y,self.start_xf,self.start_yf)
         return stepsx,stepsy
 
     
