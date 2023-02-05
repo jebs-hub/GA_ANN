@@ -20,7 +20,7 @@ class Environment():
 
     def run_simulation(self):
         if(self.view==None):
-            self.model.start_simulation()
+            self.model.run_simulation()
         else:
             self.view.window.after(500, self.move)
             while (not self.model.stop()):

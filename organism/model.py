@@ -117,6 +117,7 @@ class OrgsModel:
                 self.feeding+=1
                 self.fed = True
                 self.new_food_coords()
+        #print(self.x,self.y)
         return stepsx,stepsy
 
     
@@ -201,5 +202,5 @@ class OrgsModel:
         return [self.xf,self.yf]
     
     def new_food_coords(self):
-        self.start_xf = random.randint(20,self.size_env-20)
-        self.start_yf = random.randint(20,self.size_env-20)
+        self.xf = random.randint(20,self.size_env-20)
+        self.yf = random.randint(20,self.size_env-20)

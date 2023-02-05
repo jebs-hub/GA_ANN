@@ -54,6 +54,9 @@ class EnvModel:
                     self.orgs.append(new)
                 else:
                     first = False
+        self.start_time = time.time()
+        self.feeding = 0
+        self.moves = 0
     
     def grow(self):
         pass 
@@ -104,7 +107,7 @@ class EnvModel:
     # --------------------------------------- Simulation ----------------------------------------- #
 
     def stop(self):
-        return time.time()-self.start_time>self.duration and self.all_dead
+        return time.time()-self.start_time>self.duration or self.all_dead
     
     
     def move(self):
@@ -131,10 +134,7 @@ class EnvModel:
                     
 
     def run_simulation(self):   ##run evolution
-        self.start_time = time.time()
-        self.feeding = 0
-        self.moves = 0
-        while (not self.stop):
+        while (not self.stop()):
             self.move()
     
     # --------------------------------------- View -------------------------------------- #
