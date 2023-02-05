@@ -117,7 +117,7 @@ class OrgsModel:
                 self.feeding+=1
                 self.fed = True
                 self.new_food_coords()
-        #print(self.x,self.y)
+        print(self.x,self.y,self.start_xf,self.start_yf)
         return stepsx,stepsy
 
     
