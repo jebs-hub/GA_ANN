@@ -10,10 +10,12 @@ def build():
     env.model.print_gen_report()
     env.model.save_report(n=10)
 
+
 def rebuild():
     env.model.rebuild_gen("gen0")
     env.create_view()
     env.run_simulation()
     env.model.print_gen_report()
+
 
 rebuild()
