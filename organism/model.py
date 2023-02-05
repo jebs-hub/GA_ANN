@@ -92,18 +92,24 @@ class OrgsModel:
         output = self.nn.get_output()
         max = output[0]
         idx = 0
+        stepsx = 0
+        stepsy = 0
         for i in range(len(output)):
             if(output[i]>max):
                 max == output[i]
                 idx = i
         if(idx==0): #up
             self.y -= 10
+            stepsy = -10
         if(idx==1):
             self.y += 10
+            stepsy = +10
         if(idx==2):
             self.x += 10
+            stepsx = +10
         if(idx==3):
-            self.x += 10
+            self.x -= 10
+            stepsx = -10
         if(self.isOutOfBounds()):
             self.die()
         else:
@@ -111,6 +117,7 @@ class OrgsModel:
                 self.feeding+=1
                 self.fed = True
                 self.new_food_coords()
+        return stepsx,stepsy
 
     
     def isFoodReached(self):

@@ -4,9 +4,9 @@ import os
 
 from organism.organism import Organism
 
-class environment:
+class EnvModel:
    
-    def __init__(self,size_env,size_pop,vel,coll_radius,duration):        #TODO modify constructor
+    def __init__(self,size_env,size_pop,vel,coll_radius,duration):   
         self.orgs = []
         self.start_time = time.time()
         self.gen = 0
@@ -18,6 +18,7 @@ class environment:
         self.vel = vel 
         self.coll_radius = coll_radius
         self.duration = duration
+        self.all_dead = False
 
     
     # --------------------------------------- Create Gen ----------------------------------------- #
@@ -102,11 +103,18 @@ class environment:
 
     # --------------------------------------- Simulation ----------------------------------------- #
 
+    def stop(self):
+        return time.time()-self.start_time>self.duration and self.all_dead
+    
+    
     def move(self):
+        all_dead = True
         for org in self.orgs:
             if(not org.model.isDead()):
                 org.move()
+                all_dead = False
         self.moves+=1
+        self.all_dead = all_dead
     
     
     def rank(self):
@@ -126,5 +134,11 @@ class environment:
         self.start_time = time.time()
         self.feeding = 0
         self.moves = 0
-        while (time.time()-self.start_time<=self.duration):
+        while (not self.stop):
             self.move()
+    
+    # --------------------------------------- View -------------------------------------- #
+
+    def create_view(self,canvas,color,size):
+        for o in self.orgs:
+            o.create_view(canvas,color,size)
