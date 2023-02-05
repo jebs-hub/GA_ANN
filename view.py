@@ -235,6 +235,7 @@ class OrganismView():
             if(self.isFoodReached()):
                 self.feed()
                 self.previous_move = None
+        print(self.x,self.y,self.start_xf,self.start_yf)
 
     
     def feed(self):
