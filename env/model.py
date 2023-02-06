@@ -54,12 +54,17 @@ class EnvModel:
                     self.orgs.append(new)
                 else:
                     first = False
-        self.start_time = time.time()
-        self.feeding = 0
-        self.moves = 0
     
-    def grow(self):
-        pass 
+    def grow(self,n=10):
+        next_gen = []
+        des = self.size_pop//n
+        id = 1
+        for i in range(n):
+            for j in range(des):
+                new = self.orgs[i].reproduce(id)
+                next_gen.append(new)
+                id+=1
+        self.orgs = next_gen
 
     
     # -------------------------------------- Output info ----------------------------------------#
@@ -122,7 +127,7 @@ class EnvModel:
     
     def rank(self):
         self.orgs.sort(key=lambda x: x.model.feeding, reverse=True)
-        pass
+
 
     def end_simulation(self):
         for o in self.orgs:
@@ -131,11 +136,21 @@ class EnvModel:
             if(o.model.feeding>=1):
                 self.feeding+=1           
             o.model.define_score()
+
+
+    def update_gen(self):
+        self.feeding = 0
+        self.moves = 0
+        self.gen+=1
+        self.all_dead = False
                     
 
     def run_simulation(self):   ##run evolution
+        self.start_time = time.time()
+        print(self.gen)
         while (not self.stop()):
             self.move()
+    
     
     # --------------------------------------- View -------------------------------------- #
 

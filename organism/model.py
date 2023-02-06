@@ -17,14 +17,12 @@ class OrgsModel:
         self.fed = False
 
     
-    def rise(self,gen,id,ancestral,neural_net=None):
-        
+    def rise(self,gen,id,ancestral,neural_net=None):    
         self.start_x = random.randint(20,self.size_env-20)
         self.start_y = random.randint(20,self.size_env-20)
         self.x = self.start_x
         self.y = self.start_y
-        self.start_xf = random.randint(20,self.size_env-20)
-        self.start_yf = random.randint(20,self.size_env-20)
+        self.start_xf, self.start_yf = self.generate_food_position()
         self.xf = self.start_xf
         self.yf = self.start_yf
         
@@ -44,11 +42,13 @@ class OrgsModel:
     def rebuild(self,data,path):
         file = path+"/brains/"+data[0]
         self.id = int(data[0])
-        self.score = float(data[1])
+        #self.score = float(data[1])
+        self.score = 0
         self.gen = int(data[2])
         self.ancestral = int(data[3])
         self.time_alive = float(data[4])
-        self.feeding = int(data[5])
+        #self.feeding = int(data[5])
+        self.feeding = 0
         self.start_x = int(data[6])
         self.start_y = int(data[7])
         self.x = int(data[6])
@@ -58,6 +58,43 @@ class OrgsModel:
         self.xf = int(data[8])
         self.yf = int(data[9])
         self.nn = NeuralNetwork(file=file)
+    
+
+    def generate_food_position(self):
+        lado = random.randint(1,4)
+        x1 = self.x-10
+        x2 = self.x+10
+        y1 = self.y-10
+        y2 = self.y+10
+        
+        sort = random.randint(1,2)
+        if(sort == 1):
+            if(x1>10):
+                xf = x1 
+            else: 
+                xf = x2
+        
+        if(sort == 2):
+            if(x2<690):
+                xf = x2 
+            else: 
+                xf = x1
+        
+        sort = random.randint(1,2)
+        if(sort == 1):
+            if(y1>10):
+                yf = y1 
+            else: 
+                yf = y2
+        
+        if(sort == 2):
+            if(y2<690):
+                yf = y2 
+            else: 
+                yf = y1
+        xf = random.randint(20,self.size_env-20)
+        yf = random.randint(20,self.size_env-20)
+        return xf,yf
 
 
     def increment_number_of_feeding(self):
@@ -86,34 +123,54 @@ class OrgsModel:
 
     
     def move(self):
+        #test = 0.95
         self.fed = False
-        self.nn.input_data([self.xf,self.yf])
+        self.nn.input_data([self.xf-self.x,self.y-self.yf])
         self.nn.run_net()
         output = self.nn.get_output()
+        #print(output)
         max = output[0]
         idx = 0
         stepsx = 0
         stepsy = 0
         for i in range(len(output)):
             if(output[i]>max):
-                max == output[i]
+                max = output[i]
                 idx = i
+        #if(max<test):
+         #   idx=-1
+          #  print("aqui",test,max)
         if(idx==0): #up
+            if(self.yf<self.y):
+                self.score+=1
+                #print("nota")
             self.y -= 10
             stepsy = -10
             #print("up")
-        if(idx==1):
+        elif(idx==1):
+            if(self.yf>self.y):
+                self.score+=1
+                #print("nota")
             self.y += 10
             stepsy = +10
             #print("down")
-        if(idx==2):
+        elif(idx==2):
+            if(self.xf>self.x):
+                self.score+=1
+                #print("nota")
             self.x += 10
             stepsx = +10
             #print("right")
-        if(idx==3):
+        elif(idx==3):
+            if(self.xf<self.x):
+                self.score+=1
+                #print("nota")
             self.x -= 10
             stepsx = -10
             #print("left")
+        else:
+            self.die()
+            return 0,0
         if(self.isOutOfBounds()):
             self.die()
         else:
@@ -125,8 +182,11 @@ class OrgsModel:
 
     
     def isFoodReached(self):
-        distance = self.get_distance([self.xf,self.yf],[self.x, self.y])
-        if(distance<=self.coll_radius): #collision
+        #distance = self.get_distance([self.xf,self.yf],[self.x, self.y])
+        distance_x = abs(self.x-self.xf)
+        distance_y = abs(self.y-self.yf)
+        #print(distance_x,distance_y,self.x,self.y,self.xf,self.yf)
+        if(distance_x<self.coll_radius and distance_y<self.coll_radius): #collision
             return True 
         return False
 
@@ -174,13 +234,13 @@ class OrgsModel:
 
     def define_score(self): #TODO review score
         pass
-        if(self.feeding>=1):
-            initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
-            self.score = self.time_alive + 10*self.feeding + initial_distance//120
-        else:
-            initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
-            final_distance = self.get_distance([self.x,self.y],[self.start_xf,self.start_yf])
-            self.score = self.time_alive + 10*(initial_distance-final_distance)//initial_distance
+        #if(self.feeding>=1):
+            #initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
+            #self.score = self.time_alive + 10*self.feeding + initial_distance//120
+        #else:
+            #initial_distance = self.get_distance([self.start_x,self.start_y],[self.start_xf,self.start_yf])
+            #final_distance = self.get_distance([self.x,self.y],[self.start_xf,self.start_yf])
+            #self.score = self.time_alive + 10*(initial_distance-final_distance)//initial_distance
     
 
     def data_for_report(self):
@@ -205,5 +265,4 @@ class OrgsModel:
         return [self.xf,self.yf]
     
     def new_food_coords(self):
-        self.xf = random.randint(20,self.size_env-20)
-        self.yf = random.randint(20,self.size_env-20)
+        self.xf,self.yf = self.generate_food_position()

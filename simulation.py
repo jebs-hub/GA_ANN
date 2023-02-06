@@ -1,5 +1,5 @@
 from env.env import Environment
-env = Environment(500,2000,10,10,70)
+env = Environment(500,3000,5,10,70)
 
 def build():
     env.model.start_gen()
@@ -8,7 +8,8 @@ def build():
     env.model.end_simulation()
     env.model.rank()
     env.model.print_gen_report()
-    env.model.save_report(n=10)
+    env.model.print_orgs_report(n=10)
+    #env.model.save_report(n=10)
 
 
 def rebuild():
@@ -18,4 +19,4 @@ def rebuild():
     env.model.print_gen_report()
 
 
-rebuild()
+build()

@@ -1,6 +1,8 @@
 from env.model import EnvModel
 from env.view import EnvView
 
+import time
+
 class Environment():
 
     def __init__(self,size_env,size_pop,vel,coll_radius,duration):
@@ -22,6 +24,7 @@ class Environment():
         if(self.view==None):
             self.model.run_simulation()
         else:
+            self.model.start_time = time.time()
             self.view.window.after(500, self.move)
             while (not self.model.stop()):
                 self.view.window.update()

@@ -11,3 +11,33 @@ MORE IMPORTANT
 -> write problems faced and changes of plans
 -> change the way distance is calculated 
 -> better way to get the output: I am just getting the bigger one
+
+
+TRAIN 1
+ordered by number of feeding 
+2000 orgs 
+select 100 bests
+random foos spam
+it seems to give the bests results
+
+
+TRAIN 2
+ordered by number of correct moves 
+2000 orgs 
+select 100 bests
+random foos spam
+The results aren't good, by third gen, the number of feeding zero or one
+
+
+TRAIN 3
+the same as TRAIN 1, but with 20 gens
+
+
+TRAIN 4
+the same as before, but with more time
+
+TRAIN 5
+the same as before, but sorting by feeding and score
+
+TRAIN 5
+mix the bests results with infnity time (follow until everyone dies)
