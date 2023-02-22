@@ -15,6 +15,7 @@ class OrgsModel:
         self.dead = False
         self.coll_radius = coll_radius
         self.fed = False
+        self.previous_move = None
 
     
     def rise(self,gen,id,ancestral,neural_net=None):    
@@ -124,6 +125,7 @@ class OrgsModel:
     
     def move(self):
         #test = 0.95
+        current_move = 'up'
         self.fed = False
         self.nn.input_data([self.xf-self.x,self.y-self.yf])
         self.nn.run_net()
@@ -153,6 +155,7 @@ class OrgsModel:
                 #print("nota")
             self.y += 10
             stepsy = +10
+            current_move = 'down'
             #print("down")
         elif(idx==2):
             if(self.xf>self.x):
@@ -160,6 +163,7 @@ class OrgsModel:
                 #print("nota")
             self.x += 10
             stepsx = +10
+            current_move = 'right'
             #print("right")
         elif(idx==3):
             if(self.xf<self.x):
@@ -167,6 +171,7 @@ class OrgsModel:
                 #print("nota")
             self.x -= 10
             stepsx = -10
+            current_move = 'left'
             #print("left")
         else:
             self.die()
@@ -178,6 +183,15 @@ class OrgsModel:
                 self.feeding+=1
                 self.fed = True
                 self.new_food_coords()
+            elif(self.previous_move == 'down' and current_move == 'up'):
+                self.die()
+            elif(self.previous_move == 'up' and current_move == 'down'):
+                self.die()
+            elif(self.previous_move == 'right' and current_move == 'left'):
+                self.die()
+            elif(self.previous_move == 'left' and current_move == 'right'):
+                self.die()
+        self.previous_move = current_move
         return stepsx,stepsy
 
     

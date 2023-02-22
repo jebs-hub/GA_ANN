@@ -6,17 +6,17 @@ def build():
     env.create_view()
     env.run_simulation()
     env.model.end_simulation()
-    env.model.rank()
-    env.model.print_gen_report()
-    env.model.print_orgs_report(n=10)
+    #env.model.rank()
+    #env.model.print_gen_report()
+    #env.model.print_orgs_report(n=10)
     #env.model.save_report(n=10)
 
 
 def rebuild():
-    env.model.rebuild_gen("train3/gen0",1)
+    env.model.rebuild_gen("train3/gen0",5)
     env.create_view()
     env.run_simulation()
     env.model.print_gen_report()
 
 
-rebuild()
+build()
