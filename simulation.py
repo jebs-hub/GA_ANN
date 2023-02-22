@@ -1,5 +1,5 @@
 from env.env import Environment
-env = Environment(500,3000,5,10,70)
+env = Environment(500,1,1,10,180)
 
 def build():
     env.model.start_gen()
@@ -13,10 +13,10 @@ def build():
 
 
 def rebuild():
-    env.model.rebuild_gen("train3/gen0",5)
+    env.model.rebuild_gen("train6/gen19",5)
     env.create_view()
     env.run_simulation()
     env.model.print_gen_report()
 
 
-build()
+rebuild()

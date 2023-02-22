@@ -16,11 +16,16 @@ class OrgsModel:
         self.coll_radius = coll_radius
         self.fed = False
         self.previous_move = None
+        self.score_increment = 1
 
     
     def rise(self,gen,id,ancestral,neural_net=None):    
-        self.start_x = random.randint(20,self.size_env-20)
-        self.start_y = random.randint(20,self.size_env-20)
+        #self.start_x = random.randint(20,self.size_env-20)
+        #self.start_y = random.randint(20,self.size_env-20)
+        self.start_x = random.randint(2,self.size_env/10-2)
+        self.start_y = random.randint(2,self.size_env/10-2)
+        self.start_x *= 10
+        self.start_y *= 10
         self.x = self.start_x
         self.y = self.start_y
         self.start_xf, self.start_yf = self.generate_food_position()
@@ -93,8 +98,12 @@ class OrgsModel:
                 yf = y2 
             else: 
                 yf = y1
-        xf = random.randint(20,self.size_env-20)
-        yf = random.randint(20,self.size_env-20)
+        #xf = random.randint(20,self.size_env-20)
+        #yf = random.randint(20,self.size_env-20)
+        xf = random.randint(2,self.size_env/10-2)
+        yf = random.randint(2,self.size_env/10-2)
+        xf*=10
+        yf*=10
         return xf,yf
 
 
@@ -125,6 +134,7 @@ class OrgsModel:
     
     def move(self):
         #test = 0.95
+        vel = 10
         current_move = 'up'
         self.fed = False
         self.nn.input_data([self.xf-self.x,self.y-self.yf])
@@ -144,33 +154,45 @@ class OrgsModel:
           #  print("aqui",test,max)
         if(idx==0): #up
             if(self.yf<self.y):
-                self.score+=1
+                self.score+=self.score_increment
+                self.score_increment+=1
+            else:
+                self.score_increment = 0
                 #print("nota")
-            self.y -= 10
-            stepsy = -10
+            self.y -= vel
+            stepsy = -vel
             #print("up")
         elif(idx==1):
             if(self.yf>self.y):
-                self.score+=1
+                self.score+=self.score_increment
+                self.score_increment+=1
+            else:
+                self.score_increment = 0
                 #print("nota")
-            self.y += 10
-            stepsy = +10
+            self.y += vel
+            stepsy = +vel
             current_move = 'down'
             #print("down")
         elif(idx==2):
             if(self.xf>self.x):
-                self.score+=1
+                self.score+=self.score_increment
+                self.score_increment+=1
+            else:
+                self.score_increment = 0
                 #print("nota")
-            self.x += 10
-            stepsx = +10
+            self.x += vel
+            stepsx = vel
             current_move = 'right'
             #print("right")
         elif(idx==3):
             if(self.xf<self.x):
-                self.score+=1
+                self.score+=self.score_increment
+                self.score_increment+=1
+            else:
+                self.score_increment = 0
                 #print("nota")
-            self.x -= 10
-            stepsx = -10
+            self.x -= vel
+            stepsx = -vel
             current_move = 'left'
             #print("left")
         else:
@@ -183,15 +205,16 @@ class OrgsModel:
                 self.feeding+=1
                 self.fed = True
                 self.new_food_coords()
-            elif(self.previous_move == 'down' and current_move == 'up'):
-                self.die()
-            elif(self.previous_move == 'up' and current_move == 'down'):
-                self.die()
-            elif(self.previous_move == 'right' and current_move == 'left'):
-                self.die()
-            elif(self.previous_move == 'left' and current_move == 'right'):
-                self.die()
+            #elif(self.previous_move == 'down' and current_move == 'up'):
+            #    self.die()
+            #elif(self.previous_move == 'up' and current_move == 'down'):
+            #    self.die()
+            #elif(self.previous_move == 'right' and current_move == 'left'):
+            #    self.die()
+            #elif(self.previous_move == 'left' and current_move == 'right'):
+            #    self.die()
         self.previous_move = current_move
+        #print(self.score,self.xf,self.x)
         return stepsx,stepsy
 
     

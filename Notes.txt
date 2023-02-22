@@ -25,19 +25,34 @@ TRAIN 2
 ordered by number of correct moves 
 2000 orgs 
 select 100 bests
-random foos spam
+random food spam
 The results aren't good, by third gen, the number of feeding zero or one
 
 
 TRAIN 3
 the same as TRAIN 1, but with 20 gens
 
-
 TRAIN 4
+ordered by number of correct moves (by AP score)
+2000 orgs 
+select 100 bests
+random food spam
+vel = 10
+
+TRAIN 5
+same as before
+vel = 1
+
+TRAIN 6
+same as before 
+vel = 10
+food and orgs can apear just on ten multiple positions
+
+TRAIN 7
 the same as before, but with more time
 
-TRAIN 5
+TRAIN 8
 the same as before, but sorting by feeding and score
 
-TRAIN 5
+TRAIN 9
 mix the bests results with infnity time (follow until everyone dies)
