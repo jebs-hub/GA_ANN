@@ -57,7 +57,7 @@ class EnvModel:
                         self.orgs.append(new)
                     else:
                         first = False
-                elif(i<=n):
+                elif(i<=n+1):
                     if(not first):
                         new = Organism(self.size_env,self.coll_radius,self.vel)
                         new.rebuild(row,path_gen)
