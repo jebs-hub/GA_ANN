@@ -30,7 +30,7 @@ class EnvModel:
             self.orgs.append(new)
     
 
-    def rebuild_gen(self,path_gen):
+    def rebuild_gen(self,path_gen,n=None):
         with open(path_gen+"/resume.csv","r") as file:
             csvreader = csv.reader(file)
             data = []
@@ -44,16 +44,26 @@ class EnvModel:
             self.moves = int(data[5])
             self.avg = float(data[6])
             self.feeding = int(data[7])
+        i = 0
         with open(path_gen+"/performances.csv", 'r') as file:
             csvreader = csv.reader(file)
             first = True
             for row in csvreader:
-                if(not first):
-                    new = Organism(self.size_env,self.coll_radius,self.vel)
-                    new.rebuild(row,path_gen)
-                    self.orgs.append(new)
-                else:
-                    first = False
+                i+=1
+                if(n==None):
+                    if(not first):
+                        new = Organism(self.size_env,self.coll_radius,self.vel)
+                        new.rebuild(row,path_gen)
+                        self.orgs.append(new)
+                    else:
+                        first = False
+                elif(i<=n):
+                    if(not first):
+                        new = Organism(self.size_env,self.coll_radius,self.vel)
+                        new.rebuild(row,path_gen)
+                        self.orgs.append(new)
+                    else:
+                        first = False
     
     def grow(self,n=10):
         next_gen = []
