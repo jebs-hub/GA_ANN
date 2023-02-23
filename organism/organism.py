@@ -48,3 +48,9 @@ class Organism():
         new = Organism(self.size_env,self.coll_radius,self.vel,model=new_model)
         new.created = True
         return new
+    
+    def copy(self,id):
+        new_model = self.model.copy(id)
+        new = Organism(self.size_env,self.coll_radius,self.vel,model=new_model)
+        new.created = True
+        return new

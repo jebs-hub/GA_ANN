@@ -33,7 +33,7 @@ class Train():
             self.env.model.print_orgs_report(n=self.n_firsts)
             self.env.model.print_gen_report()
         if(reports):
-            self.env.model.save_report(dir=self.dest_dir,n=self.n_firsts) #TODO function must receive a path
+            self.env.model.save_report(dir=self.dest_dir,n=2000) #TODO function must receive a path
 
 
     def train(self,logs=False,reports=False):
@@ -41,7 +41,7 @@ class Train():
         while(count<self.num_gens):
             self.simulate(logs,reports)
             self.env.model.update_gen()
-            self.env.model.grow(n=self.n_firsts)
+            self.env.model.grow(n=100)
             count+=1
     
 
@@ -64,6 +64,6 @@ class Train():
 
 
 train = Train()
-train.new_training(20,"train6/",1,2000,500,5,5,20,10,10,100)
+train.new_training(20,"train11/",1,2000,500,5,5,20,10,10,1)
 train.train(reports=True)
 #train.view_gen("prod")

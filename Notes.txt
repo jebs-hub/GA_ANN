@@ -47,6 +47,32 @@ TRAIN 6
 same as before 
 vel = 10
 food and orgs can apear just on ten multiple positions
+## Bests Results ##
+
+TRAIN 7
+same as train 6, but the bests orgs are also copied to the next gen 
+
+TRAIN 8
+Trying to understand why train 7 is not passing orgs to the next gen
+
+TRAIN 9
+Repeating train 6 to check if the good results were luck 
+
+TRAIN 10
+Repeating train 6, but with the 10 bests
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 TRAIN 7
 the same as before, but with more time

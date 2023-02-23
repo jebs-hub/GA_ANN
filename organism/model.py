@@ -17,6 +17,7 @@ class OrgsModel:
         self.fed = False
         self.previous_move = None
         self.score_increment = 1
+        self.isCopy = False
 
     
     def rise(self,gen,id,ancestral,neural_net=None):    
@@ -43,6 +44,8 @@ class OrgsModel:
         self.gen = gen
         self.feeding = 0
         self.time_alive = 0
+        #print(self.gen,self.id)
+        #self.nn.print()
     
 
     def rebuild(self,data,path):
@@ -52,17 +55,17 @@ class OrgsModel:
         self.score = 0
         self.gen = int(data[2])
         self.ancestral = int(data[3])
-        self.time_alive = float(data[4])
+        self.time_alive = float(data[5])
         #self.feeding = int(data[5])
         self.feeding = 0
-        self.start_x = int(data[6])
-        self.start_y = int(data[7])
-        self.x = int(data[6])
-        self.y = int(data[7])
-        self.start_xf = int(data[8])
-        self.start_yf = int(data[9])
-        self.xf = int(data[8])
-        self.yf = int(data[9])
+        self.start_x = int(data[7])
+        self.start_y = int(data[8])
+        self.x = int(data[7])
+        self.y = int(data[8])
+        self.start_xf = int(data[9])
+        self.start_yf = int(data[10])
+        self.xf = int(data[9])
+        self.yf = int(data[10])
         self.nn = NeuralNetwork(file=file)
     
 
@@ -255,6 +258,15 @@ class OrgsModel:
         return new
     
 
+    def copy(self,id):
+        nn = self.nn.copy()
+        next_gen = self.gen+1
+        new = OrgsModel(self.size_env,self.coll_radius)
+        new.rise(next_gen,id,self.id,neural_net=nn)
+        new.isCopy = True
+        return new
+    
+
     def end(self):
         if(not self.dead):
             self.die() 
@@ -281,7 +293,7 @@ class OrgsModel:
     
 
     def data_for_report(self):
-        return [self.id,self.score,self.gen,self.ancestral,self.time_alive,self.feeding,self.start_x,self.start_y,self.start_xf,self.start_yf]
+        return [self.id,self.score,self.gen,self.ancestral,self.isCopy,self.time_alive,self.feeding,self.start_x,self.start_y,self.start_xf,self.start_yf]
     
 
     def brain_for_report(self,prefix):

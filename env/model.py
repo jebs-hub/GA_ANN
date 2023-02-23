@@ -70,7 +70,12 @@ class EnvModel:
         des = self.size_pop//n
         id = 1
         for i in range(n):
-            for j in range(des):
+            new = self.orgs[i].copy(id)
+            #self.orgs[i].model.nn.print()
+            #new.model.nn.print()
+            next_gen.append(new)
+            id+=1
+            for j in range(des-1):
                 new = self.orgs[i].reproduce(id)
                 next_gen.append(new)
                 id+=1
@@ -111,7 +116,7 @@ class EnvModel:
             f.close()
         with open(file_orgs+".csv", 'w') as f:
             writer = csv.writer(f)
-            header = ["id","score","gen","ancestral","time alive","feeding","xi","yi","xfi","yfi"]
+            header = ["id","score","gen","ancestral","copy","time alive","feeding","xi","yi","xfi","yfi"]
             writer.writerow(header)
             for i in range(n):
                 data = self.orgs[i].model.data_for_report()
