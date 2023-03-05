@@ -156,6 +156,7 @@ class EnvModel:
         for o in self.orgs:
             if(i<n):
                 sum_n_scores+=o.model.score
+            i+=1
             sum_all_scores+=o.model.score
             if(not o.model.isDead()):
                 o.model.die()
@@ -163,7 +164,7 @@ class EnvModel:
                 self.feeding+=1           
             #o.model.define_score()
         self.avg = sum_all_scores/2000
-        self.avg_selected = sum_all_scores/n
+        self.avg_selected = sum_n_scores/n
 
 
     def update_gen(self):

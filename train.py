@@ -22,6 +22,9 @@ class Train():
         self.n_firsts = n_firsts
         self.env = Environment(board_size,pop_size,vel,coll_radius,duration)
         self.env.model.start_gen()
+        self.gens = []
+        self.avgs = []
+        self.avgs_n = []
     
 
     def simulate(self,logs,reports):
@@ -29,6 +32,9 @@ class Train():
         self.env.run_simulation()
         self.env.model.rank()
         self.env.model.end_simulation(n=self.n_firsts)
+        self.gens.append(self.env.model.gen)
+        self.avgs.append(self.env.model.avg)
+        self.avgs_n.append(self.env.model.avg_selected)
         if(logs):
             self.env.model.print_orgs_report(n=self.n_firsts)
             self.env.model.print_gen_report()
@@ -64,6 +70,7 @@ class Train():
 
 
 train = Train()
-train.new_training(10,"trains/train14/",1,2000,500,5,5,20,10,10,100)
+train.new_training(20,"trains/train15/",1,2000,500,5,5,20,10,10,100)
 train.train(reports=True)
+print(train.avgs,train.avgs_n)
 #train.view_gen("prod")
