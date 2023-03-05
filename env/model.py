@@ -83,6 +83,7 @@ class EnvModel:
                 new = self.orgs[i].reproduce(id)
                 next_gen.append(new)
                 id+=1
+            self.orgs[i].reset(copy_id)
             self.orgs[i].model.gen+=1
             self.orgs[i].model.ancestral = self.orgs[i].model.id
             self.orgs[i].model.id = copy_id
@@ -99,7 +100,7 @@ class EnvModel:
 
 
     def print_orgs_report(self,n=10):
-        print("id\tscore\tgen\tancestral\ttime alive\tfeeding\txi\tyi\txfi\tyfi")
+        print("id\tscore\tgen\tancestral\ttime alive\tfeeding\txi\tyi\txfi\tyfi\tbirth gen")
         for i in range(n):
             self.orgs[i].model.print_orgs_report()
     
@@ -124,7 +125,7 @@ class EnvModel:
             f.close()
         with open(file_orgs+".csv", 'w') as f:
             writer = csv.writer(f)
-            header = ["id","score","gen","ancestral","copy","time alive","feeding","xi","yi","xfi","yfi"]
+            header = ["id","score","gen","ancestral","copy","time alive","feeding","xi","yi","xfi","yfi","birth gen"]
             writer.writerow(header)
             for i in range(n):
                 data = self.orgs[i].model.data_for_report()
@@ -173,7 +174,6 @@ class EnvModel:
         print(self.gen)
         while (not self.stop()):
             self.move()
-    
     
     # --------------------------------------- View -------------------------------------- #
 

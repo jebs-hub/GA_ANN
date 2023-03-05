@@ -44,6 +44,7 @@ class OrgsModel:
         self.gen = gen
         self.feeding = 0
         self.time_alive = 0
+        self.birth_gen = gen
         #print(self.gen,self.id)
         #self.nn.print()
     
@@ -67,6 +68,7 @@ class OrgsModel:
         self.xf = int(data[9])
         self.yf = int(data[10])
         self.nn = NeuralNetwork(file=file)
+        self.birth_gen = int(data[11])
     
 
     def generate_food_position(self):
@@ -143,6 +145,7 @@ class OrgsModel:
         self.nn.input_data([self.xf-self.x,self.y-self.yf])
         self.nn.run_net()
         output = self.nn.get_output()
+        print(output)
         #print(output)
         max = output[0]
         idx = 0
@@ -257,7 +260,30 @@ class OrgsModel:
         new.rise(next_gen,id,self.id,neural_net=nn)
         return new
     
-
+    def reset(self,id):
+        self.isCopy = True
+        self.score = 0
+        self.dead = False
+        self.gen+=1
+        self.ancestral = self.id
+        self.id = id
+        self.start = time.time()
+        self.fed = False
+        self.previous_move = None
+        self.score_increment = 1
+        self.time_alive = 0
+        #positions
+        self.start_x = random.randint(2,self.size_env/10-2)
+        self.start_y = random.randint(2,self.size_env/10-2)
+        self.start_x *= 10
+        self.start_y *= 10
+        self.x = self.start_x
+        self.y = self.start_y
+        self.start_xf, self.start_yf = self.generate_food_position()
+        self.xf = self.start_xf
+        self.yf = self.start_yf
+    
+    
     def copy(self,id):
         nn = self.nn.copy()
         next_gen = self.gen+1
@@ -293,7 +319,7 @@ class OrgsModel:
     
 
     def data_for_report(self):
-        return [self.id,self.score,self.gen,self.ancestral,self.isCopy,self.time_alive,self.feeding,self.start_x,self.start_y,self.start_xf,self.start_yf]
+        return [self.id,self.score,self.gen,self.ancestral,self.isCopy,self.time_alive,self.feeding,self.start_x,self.start_y,self.start_xf,self.start_yf,self.birth_gen]
     
 
     def brain_for_report(self,prefix):
@@ -303,7 +329,7 @@ class OrgsModel:
 
 
     def print_orgs_report(self):
-        print("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format(self.id,self.score,self.gen,self.ancestral,self.time_alive,self.feeding,self.start_x,self.start_y,self.start_xf,self.start_yf))
+        print("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format(self.id,self.score,self.gen,self.ancestral,self.time_alive,self.feeding,self.start_x,self.start_y,self.start_xf,self.start_yf,self.birth_gen))
 
 
     def print_orgs_brain_report(self):
