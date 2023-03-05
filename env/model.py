@@ -12,6 +12,7 @@ class EnvModel:
         self.gen = 0
         self.moves = 0
         self.avg = 0
+        self.avg_selected = 0
         self.feeding = 0
         self.size_env = size_env
         self.size_pop = size_pop
@@ -43,7 +44,8 @@ class EnvModel:
             self.coll_radius = float(data[4])
             self.moves = int(data[5])
             self.avg = float(data[6])
-            self.feeding = int(data[7])
+            self.avg_selected = float(data[7])
+            self.feeding = int(data[8])
         i = 0
         with open(path_gen+"/performances.csv", 'r') as file:
             csvreader = csv.reader(file)
@@ -73,9 +75,6 @@ class EnvModel:
             #new = self.orgs[i].copy(id)
             #self.orgs[i].model.nn.print()
             #new.model.nn.print()
-            self.orgs[i].model.isCopy = True
-            self.orgs[i].model.score = 0
-            self.orgs[i].model.dead = False
             next_gen.append(self.orgs[i])
             copy_id = id
             id+=1
@@ -83,10 +82,7 @@ class EnvModel:
                 new = self.orgs[i].reproduce(id)
                 next_gen.append(new)
                 id+=1
-            self.orgs[i].reset(copy_id)
-            self.orgs[i].model.gen+=1
-            self.orgs[i].model.ancestral = self.orgs[i].model.id
-            self.orgs[i].model.id = copy_id
+            self.orgs[i].model.reset(copy_id)
         self.orgs = next_gen
 
 
@@ -95,8 +91,8 @@ class EnvModel:
     
 
     def print_gen_report(self): #TODO print report in the same format of save report
-        print("gen\tboard size\tpop\tvel\tcoll radius\tmoves\tavg score\tfeeding")
-        print("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format(self.gen,self.size_env,self.size_pop,self.vel,self.coll_radius,self.moves,self.avg,self.feeding))
+        print("gen\tboard size\tpop\tvel\tcoll radius\tmoves\tavg score\tavg selected\tfeeding")
+        print("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}".format(self.gen,self.size_env,self.size_pop,self.vel,self.coll_radius,self.moves,self.avg,self.avg_selected,self.feeding))
 
 
     def print_orgs_report(self,n=10):
@@ -118,9 +114,9 @@ class EnvModel:
         file_brain = dir+"gen"+str(self.gen)+"/brains"
         with open(file_gen+".csv", 'w') as f:
             writer = csv.writer(f)
-            header = ["gen","board size","pop","vel","coll radius","moves","avg score","feeding"]
+            header = ["gen","board size","pop","vel","coll radius","moves","avg score","avg selected","feeding"]
             writer.writerow(header)
-            data = [self.gen,self.size_env,self.size_pop,self.vel,self.coll_radius,self.moves,self.avg,self.feeding]
+            data = [self.gen,self.size_env,self.size_pop,self.vel,self.coll_radius,self.moves,self.avg,self.avg_selected,self.feeding]
             writer.writerow(data)
             f.close()
         with open(file_orgs+".csv", 'w') as f:
@@ -153,13 +149,21 @@ class EnvModel:
         self.orgs.sort(key=lambda x: x.model.score, reverse=True)
 
 
-    def end_simulation(self):
+    def end_simulation(self,n=10):
+        i = 0
+        sum_n_scores = 0
+        sum_all_scores = 0
         for o in self.orgs:
+            if(i<n):
+                sum_n_scores+=o.model.score
+            sum_all_scores+=o.model.score
             if(not o.model.isDead()):
                 o.model.die()
             if(o.model.feeding>=1):
                 self.feeding+=1           
-            o.model.define_score()
+            #o.model.define_score()
+        self.avg = sum_all_scores/2000
+        self.avg_selected = sum_all_scores/n
 
 
     def update_gen(self):

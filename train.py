@@ -27,8 +27,8 @@ class Train():
     def simulate(self,logs,reports):
         #self.env.create_view()
         self.env.run_simulation()
-        self.env.model.end_simulation()
         self.env.model.rank()
+        self.env.model.end_simulation(n=self.n_firsts)
         if(logs):
             self.env.model.print_orgs_report(n=self.n_firsts)
             self.env.model.print_gen_report()
@@ -41,7 +41,7 @@ class Train():
         while(count<self.num_gens):
             self.simulate(logs,reports)
             self.env.model.update_gen()
-            self.env.model.grow(n=100)
+            self.env.model.grow(n=self.n_firsts)
             count+=1
     
 
@@ -64,6 +64,6 @@ class Train():
 
 
 train = Train()
-train.new_training(10,"trains/train13/",1,2000,500,5,5,20,10,10,1)
+train.new_training(10,"trains/train14/",1,2000,500,5,5,20,10,10,100)
 train.train(reports=True)
 #train.view_gen("prod")

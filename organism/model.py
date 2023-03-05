@@ -145,7 +145,6 @@ class OrgsModel:
         self.nn.input_data([self.xf-self.x,self.y-self.yf])
         self.nn.run_net()
         output = self.nn.get_output()
-        print(output)
         #print(output)
         max = output[0]
         idx = 0
