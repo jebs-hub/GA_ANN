@@ -62,7 +62,8 @@ class Neuron():
         return self.weights_times_output
     
     def copy(self):
-        copy = Neuron(self.bias, self.weights, self.activate_function)
+        new_weights = self.weights.copy()
+        copy = Neuron(self.bias, new_weights, self.activate_function)
         return copy
     
     def set_activate_function(self, function):
@@ -323,13 +324,24 @@ class NeuralNetwork():
             layer = self.neural_net[k]
             new_layer = []
             for neuron in layer:
+                #print("neuronio original antes de copiar",neuron,neuron.weights, neuron.bias)
                 new_neuron = neuron.copy() 
+                #print("novo neuronio depois de copiar",new_neuron,new_neuron.weights, new_neuron.bias)
                 if(k<self.number_of_layers-1):
+                    #print("neuronio original antes de mutar bias",neuron,neuron.weights, neuron.bias)
+                    #print("novo neuronio antes de mutar bias",new_neuron,new_neuron.weights, new_neuron.bias)
                     self.mutate_bias(new_neuron)
+                    #print("neuronio original depois de mutar bias",neuron,neuron.weights, neuron.bias)
+                    #print("novo neuronio depois de mutar bias",new_neuron,new_neuron.weights, new_neuron.bias)
                 if(k>0):
+                    #print("neuronio original antes de mutar pesos",neuron,neuron.weights, neuron.bias)
+                    #print("novo neuronio antes de mutar pesos",new_neuron,new_neuron.weights, new_neuron.bias)
                     self.mutate_weights(new_neuron)
+                    #print("neuronio original depois de mutar pesos",neuron,neuron.weights, neuron.bias)
+                    #print("novo neuronio depois de mutar pesos",new_neuron,new_neuron.weights, new_neuron.bias)
                 new_layer.append(new_neuron)
             new_neural_net.append(new_layer)
+            
         return NeuralNetwork(neural_net = new_neural_net)
 
     # ------------------------------------------------------------------------------------------------------------------- #

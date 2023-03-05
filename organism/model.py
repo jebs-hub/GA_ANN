@@ -249,7 +249,7 @@ class OrgsModel:
     def isDead(self):
         return self.dead
 
-    
+
     def reproduce(self,id):
         nn = self.nn.copy_with_mutation()
         next_gen = self.gen+1
