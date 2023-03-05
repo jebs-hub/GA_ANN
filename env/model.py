@@ -73,15 +73,10 @@ class EnvModel:
             #new = self.orgs[i].copy(id)
             #self.orgs[i].model.nn.print()
             #new.model.nn.print()
-            #print("Esse é o id do organismo copiado: {}. Seu novo id será: {}".format(self.orgs[i].model.id,id))
-            #print("Essa é a rede neural do organismo:")
-            #self.orgs[i].model.nn.print()
             self.orgs[i].model.isCopy = True
             self.orgs[i].model.score = 0
             self.orgs[i].model.dead = False
             next_gen.append(self.orgs[i])
-            #print("Essa é a rede neural do organismo depois de add a next gen:")
-            #next_gen[id-1].model.nn.print()
             copy_id = id
             id+=1
             for j in range(des-1):
@@ -92,14 +87,6 @@ class EnvModel:
             self.orgs[i].model.ancestral = self.orgs[i].model.id
             self.orgs[i].model.id = copy_id
         self.orgs = next_gen
-        #print("essa é a lista final:")
-        #for k in range(len(self.orgs)):
-            #print("LISTA ORGS")
-            #print("id: {}, ancestral: {}".format(self.orgs[k].model.id,self.orgs[k].model.ancestral))
-            #self.orgs[k].model.nn.print()
-            #print("LISTA NEXT GEN")
-            #print("id: {}, ancestral: {}".format(next_gen[k].model.id,next_gen[k].model.ancestral))
-            #next_gen[k].model.nn.print()
 
 
     
