@@ -64,6 +64,6 @@ class Train():
 
 
 train = Train()
-train.new_training(10,"trains/train13/",1,2000,500,5,5,20,10,10,1)
+train.new_training(5,"trains/train1/",1,2000,500,5,5,20,10,10,1)
 train.train(reports=True)
 #train.view_gen("prod")

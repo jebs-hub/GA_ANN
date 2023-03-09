@@ -11,3 +11,10 @@ MORE IMPORTANT
 -> write problems faced and changes of plans
 -> change the way distance is calculated 
 -> better way to get the output: I am just getting the bigger one
+
+
+Infos to add:
+ avg time alive
+ avg feeding 
+ individual number of moves and save
+
