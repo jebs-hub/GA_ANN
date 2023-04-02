@@ -62,8 +62,7 @@ class Train():
     def view_org(self,id): 
         pass 
 
-
 train = Train()
-train.new_training(5,"trains/train1/",1,2000,500,5,5,20,10,10,1)
+train.new_training(20,"trains/train1/",1,2000,500,5,5,20,10,10,1)
 train.train(reports=True)
 #train.view_gen("prod")

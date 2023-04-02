@@ -13,7 +13,7 @@ def build():
 
 
 def rebuild():
-    env.model.rebuild_gen("trains/train12/gen0",5)
+    env.model.rebuild_gen("trains/train1/gen19",5)
     env.create_view()
     env.run_simulation()
     env.model.print_gen_report()
